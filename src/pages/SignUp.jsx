@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi2';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase-config';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -11,8 +13,49 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const navigate = useNavigate();
   const { signup } = useAuth();
+
+  const validateUsername = (username) => {
+    const regex = /^[a-zA-Z0-9_]{3,20}$/;
+    return regex.test(username);
+  };
+
+  const checkUsernameAvailability = async (username) => {
+    if (!validateUsername(username)) {
+      return false;
+    }
+    const userDoc = doc(db, 'usernames', username.toLowerCase());
+    const docSnap = await getDoc(userDoc);
+    return !docSnap.exists();
+  };
+
+  const handleUsernameChange = async (e) => {
+    const newUsername = e.target.value.toLowerCase();
+    setUsername(newUsername);
+    
+    if (newUsername.length < 3) {
+      setUsernameError('Username must be at least 3 characters');
+      return;
+    }
+
+    if (!validateUsername(newUsername)) {
+      setUsernameError('Username can only contain letters, numbers, and underscores');
+      return;
+    }
+
+    setCheckingUsername(true);
+    try {
+      const isAvailable = await checkUsernameAvailability(newUsername);
+      setUsernameError(isAvailable ? '' : 'Username is already taken');
+    } catch (err) {
+      setUsernameError('Error checking username');
+    }
+    setCheckingUsername(false);
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -21,12 +64,31 @@ const SignUp = () => {
       return setError('Passwords do not match');
     }
 
+    if (!username || usernameError) {
+      return setError('Please choose a valid username');
+    }
+
     try {
       setError('');
       setLoading(true);
-      await signup(email, password);
-      // After successful signup, create user profile
-      // You can add additional user data to Firebase here
+      const userCredential = await signup(email, password);
+      
+      // Store user data in Firestore
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email,
+        username,
+        createdAt: new Date().toISOString(),
+        displayName: '',
+        photoURL: '',
+        bio: ''
+      });
+
+      // Reserve username
+      await setDoc(doc(db, 'usernames', username), {
+        uid: userCredential.user.uid,
+        createdAt: new Date().toISOString()
+      });
+
       navigate('/');
     } catch (error) {
       setError('Failed to create an account. ' + error.message);
@@ -112,6 +174,22 @@ const SignUp = () => {
                            transition-colors duration-200"
                 />
               </div>
+              <input
+                type="text"
+                placeholder="Choose a username"
+                className={`w-full px-4 py-3 bg-white/5 border ${
+                  usernameError ? 'border-red-500' : 'border-white/10'
+                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
+                transition-colors duration-200`}
+                value={username}
+                onChange={handleUsernameChange}
+              />
+              {usernameError && (
+                <p className="text-sm text-red-500 mt-1">{usernameError}</p>
+              )}
+              {checkingUsername && (
+                <p className="text-sm text-yellow-500 mt-1">Checking username availability...</p>
+              )}
               <input
                 type="email"
                 placeholder="Email"
