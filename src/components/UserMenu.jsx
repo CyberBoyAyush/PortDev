@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
@@ -110,6 +110,27 @@ const UserMenu = () => {
               My Portfolio
             </button>
             
+            <Link
+              to="/edit-profile"
+              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 
+                         dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+              Edit Portfolio
+            </Link>
+
             <button
               onClick={handleLogout}
               className="flex items-center w-full px-4 py-2 text-sm text-red-600 

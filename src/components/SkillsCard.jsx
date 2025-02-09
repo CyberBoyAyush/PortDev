@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SkillsCard = ({ skills }) => {
+const SkillsCard = ({ skills = [] }) => {
   const getSkillLevel = (level) => {
     if (level >= 90) return 'Expert';
     if (level >= 75) return 'Advanced';
