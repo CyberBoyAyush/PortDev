@@ -1,9 +1,40 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi2';
 
 const SignUp = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signup } = useAuth();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      return setError('Passwords do not match');
+    }
+
+    try {
+      setError('');
+      setLoading(true);
+      await signup(email, password);
+      // After successful signup, create user profile
+      // You can add additional user data to Firebase here
+      navigate('/');
+    } catch (error) {
+      setError('Failed to create an account. ' + error.message);
+      console.error('Signup error:', error);
+    }
+    setLoading(false);
+  }
+
   return (
     <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-4">
       {/* Background Effects */}
@@ -25,6 +56,12 @@ const SignUp = () => {
               Join the PortDev community <HiSparkles className="text-yellow-500" />
             </p>
           </div>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
 
           <div className="space-y-4">
             <div className="space-y-4 mb-6">
@@ -58,7 +95,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            <form className="space-y-4 mt-4">
+            <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
@@ -81,6 +118,8 @@ const SignUp = () => {
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
                          text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
                          transition-colors duration-200"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <input
                 type="password"
@@ -88,10 +127,23 @@ const SignUp = () => {
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
                          text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
                          transition-colors duration-200"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
+                         text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
+                         transition-colors duration-200"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
               />
               
               <motion.button
                 whileHover={{ y: -2 }}
+                type="submit"
+                disabled={loading}
                 className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 
                          text-white rounded-lg font-medium hover:opacity-90
                          transition-opacity duration-200"
