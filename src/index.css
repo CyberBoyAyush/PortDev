@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
   background-color: #0A0A0F;
   color: white;
@@ -15,10 +16,11 @@ body {
   display: flex;
   flex-direction: column;
 }
-
+ß
 /* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Custom Animations */
@@ -49,9 +51,32 @@ html {
   animation-delay: 4s;
 }
 
+/* Section Transitions */
+section {
+  @apply transition-opacity duration-500;
+}
+
+section.active {
+  @apply opacity-100;
+}
+
+section:not(.active) {
+  @apply opacity-80;
+}
+
+/* Card Hover Effects */
+.hover-card {
+  @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl;
+}
+
+/* Gradient Text */
+.gradient-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -59,12 +84,11 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.3);
-  border-radius: 3px;
+  @apply bg-gradient-to-b from-blue-500/30 to-purple-500/30 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.5);
+  @apply from-blue-500/50 to-purple-500/50;
 }
 
 /* Dark mode adjustments */
