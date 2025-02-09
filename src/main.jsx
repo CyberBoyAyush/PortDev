@@ -5,6 +5,7 @@ import App from './App'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import Portfolio from './pages/Portfolio'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/:username" element={<Portfolio />} />
         </Route>
       </Routes>
     </BrowserRouter>
