@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProjectCard = ({ projects }) => {
+const ProjectCard = ({ projects = [] }) => {
   return (
     <div className="relative backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/20">
       {/* Background Gradient */}

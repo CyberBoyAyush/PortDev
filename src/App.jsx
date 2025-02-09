@@ -2,14 +2,11 @@ import React from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import UserMenu from './components/UserMenu';
-import CreatePortfolioButton from './components/CreatePortfolioButton';
 import Footer from './components/Footer';
 
 const App = () => {
   const location = useLocation();
   const { currentUser } = useAuth();
-  
-  const showCreateButton = !currentUser && location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/signup';
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -24,23 +21,23 @@ const App = () => {
             </Link>
 
             {/* Navigation Items */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {currentUser ? (
                 <UserMenu />
               ) : (
                 <>
-                  {showCreateButton && <CreatePortfolioButton />}
                   <Link 
                     to="/login" 
-                    className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 
+                             transition-colors px-2 sm:px-3 py-2 text-sm"
                   >
                     Login
                   </Link>
                   <Link 
                     to="/signup"
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 
-                             text-white font-medium hover:shadow-lg hover:shadow-blue-500/25 
-                             transition-all duration-300"
+                    className="px-3 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 
+                             text-white text-sm font-medium hover:shadow-lg hover:shadow-blue-500/25 
+                             transition-all duration-300 whitespace-nowrap"
                   >
                     Get Started
                   </Link>

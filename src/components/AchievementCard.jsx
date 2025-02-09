@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AchievementCard = ({ achievements }) => {
+const AchievementCard = ({ achievements = [] }) => {
   return (
     <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-xl p-8 border border-gray-100 dark:border-gray-700">
       <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500">Achievements</h2>
