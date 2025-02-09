@@ -17,10 +17,18 @@ export const mockUsers = {
       {
         role: "Senior Developer",
         company: "Tech Corp",
-        startDate: "2020",
+        startDate: "2024",
         endDate: null,
         description: "Leading frontend development team and architecting solutions.",
         skills: ["React", "Node.js", "AWS"]
+      },
+      {
+        role: "SDE 1",
+        company: "Global Tech",
+        startDate: "2020",
+        endDate: 2022,
+        description: "Ai Enginner.",
+        skills: ["Python", "Tensorflow", "AWS"]
       }
     ],
     achievements: [
