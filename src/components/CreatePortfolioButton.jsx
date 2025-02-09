@@ -1,20 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { HiPlus } from 'react-icons/hi';
 
 const CreatePortfolioButton = () => {
   return (
     <Link
       to="/signup"
-      className="inline-flex items-center px-4 py-2 rounded-xl
+      className="inline-flex items-center justify-center px-3 sm:px-4 py-2 
+                 text-sm font-medium rounded-xl transition-all duration-200
                  bg-gradient-to-r from-blue-500 to-purple-500 
-                 text-white font-medium
-                 hover:shadow-lg hover:shadow-blue-500/25 
-                 transition-all duration-300"
+                 text-white hover:shadow-lg hover:shadow-blue-500/25
+                 whitespace-nowrap overflow-hidden"
     >
-      Create Your Portfolio
-      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-      </svg>
+      <HiPlus className="w-4 h-4 mr-1 sm:mr-2" />
+      <span className="hidden sm:inline">Create Portfolio</span>
+      <span className="sm:hidden">Create</span>
     </Link>
   );
 };
