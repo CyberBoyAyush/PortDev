@@ -1,75 +1,111 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { HiBriefcase, HiCalendar, HiOfficeBuilding, HiChip } from 'react-icons/hi';
 import CardContainer from './CardContainer';
 
 const ExperienceCard = ({ experiences = [] }) => {
   return (
     <CardContainer title="Experience">
-      <div className="space-y-8">
+      <div className="relative pl-8 space-y-12">
+        {/* Vertical Timeline Line */}
+        <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-blue-500 via-purple-500 to-transparent" />
+
         {experiences.map((exp, index) => (
-          <div 
+          <motion.div
             key={index}
-            className="group relative bg-gradient-to-br from-white/50 to-white/30 dark:from-gray-800/50 dark:to-gray-800/30 
-                       rounded-2xl p-6 hover:scale-[1.02] transition-all duration-300"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
           >
-            {/* Timeline Connector */}
-            <div className="absolute -left-3 top-0 h-full w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500 
-                          group-hover:scale-y-110 origin-top transition-transform duration-300"></div>
+            {/* Timeline Node */}
+            <div className="absolute -left-6">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 p-0.5"
+              >
+                <div className="w-full h-full rounded-xl bg-white dark:bg-gray-900 
+                             flex items-center justify-center">
+                  <HiBriefcase className="w-6 h-6 text-transparent bg-clip-text 
+                                      bg-gradient-to-br from-blue-500 to-purple-500" />
+                </div>
+              </motion.div>
+            </div>
 
-            {/* Content */}
-            <div className="space-y-4">
-              {/* Header */}
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white 
-                             group-hover:text-transparent group-hover:bg-clip-text 
-                             group-hover:bg-gradient-to-r group-hover:from-blue-600 
-                             group-hover:to-purple-600 transition-all duration-300">
-                  {exp.role}
-                </h3>
-                <span className="px-4 py-1 text-sm rounded-full 
+            {/* Experience Card */}
+            <motion.div
+              whileHover={{ y: -5 }}
+              className="group relative overflow-hidden rounded-2xl bg-gradient-to-br 
+                       from-white/50 to-white/10 dark:from-gray-800/50 dark:to-gray-800/10
+                       border border-white/20 dark:border-gray-700/20 p-6
+                       hover:border-blue-500/20 dark:hover:border-blue-500/20
+                       transition-all duration-300"
+            >
+              {/* Card Background Effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 
+                           opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+              <div className="relative space-y-4">
+                {/* Header */}
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white 
+                                group-hover:text-transparent group-hover:bg-clip-text
+                                group-hover:bg-gradient-to-r group-hover:from-blue-500 
+                                group-hover:to-purple-500 transition-colors duration-300">
+                      {exp.role}
+                    </h3>
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                      <HiOfficeBuilding className="w-4 h-4" />
+                      <span className="font-medium">{exp.company}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full
                                bg-gradient-to-r from-blue-500/10 to-purple-500/10 
-                               border border-blue-500/20 text-blue-700 dark:text-blue-300">
-                  {exp.startDate} - {exp.endDate || 'Present'}
-                </span>
-              </div>
-
-              {/* Company */}
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 p-0.5">
-                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center">
-                    <span className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                      {exp.company[0]}
+                               border border-blue-500/20">
+                    <HiCalendar className="w-4 h-4 text-blue-500" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {exp.startDate} - {exp.endDate || 'Present'}
                     </span>
                   </div>
                 </div>
-                <span className="text-lg text-gray-700 dark:text-gray-300">
-                  {exp.company}
-                </span>
+
+                {/* Description */}
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                  {exp.description}
+                </p>
+
+                {/* Skills */}
+                <div className="flex flex-wrap gap-2">
+                  {exp.skills.map((skill, idx) => (
+                    <motion.span
+                      key={idx}
+                      whileHover={{ scale: 1.05 }}
+                      className="flex items-center gap-1.5 px-3 py-1 text-sm rounded-full
+                               bg-white/50 dark:bg-gray-800/50
+                               border border-gray-200/50 dark:border-gray-700/50
+                               hover:border-blue-500/50 dark:hover:border-blue-500/50
+                               hover:bg-gradient-to-r hover:from-blue-500/5 hover:to-purple-500/5
+                               text-gray-700 dark:text-gray-300
+                               transition-all duration-200"
+                    >
+                      <HiChip className="w-3.5 h-3.5 text-blue-500" />
+                      {skill}
+                    </motion.span>
+                  ))}
+                </div>
               </div>
 
-              {/* Description */}
-              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                {exp.description}
-              </p>
-
-              {/* Skills */}
-              <div className="flex flex-wrap gap-2">
-                {exp.skills.map((skill, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 text-sm rounded-full 
-                             bg-gradient-to-r from-gray-50 to-gray-100 
-                             dark:from-gray-800 dark:to-gray-700
-                             border border-gray-200 dark:border-gray-600
-                             hover:border-blue-500/50 dark:hover:border-blue-500/50
-                             hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-purple-500/10
-                             transform hover:scale-105 transition-all duration-200"
-                  >
-                    {skill}
-                  </span>
-                ))}
+              {/* Decorative Corner Lines */}
+              <div className="absolute bottom-0 right-0 w-24 h-24 pointer-events-none">
+                <div className="absolute bottom-0 right-0 w-px h-24 
+                             bg-gradient-to-t from-blue-500/50 to-transparent" />
+                <div className="absolute bottom-0 right-0 h-px w-24 
+                             bg-gradient-to-r from-transparent to-blue-500/50" />
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         ))}
       </div>
     </CardContainer>
