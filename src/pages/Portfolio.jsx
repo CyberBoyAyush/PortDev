@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../config/firebase';  // Make sure this path is correct
+import { db } from '../config/firebase';
 import { HiMenu, HiX } from 'react-icons/hi';
 import ProfileCard from '../components/ProfileCard';
 import SkillsCard from '../components/SkillsCard';
 import ExperienceCard from '../components/ExperienceCard';
 import AchievementCard from '../components/AchievementCard';
 import ProjectCard from '../components/ProjectCard';
-import Footer from '../components/Footer';
 
 const Portfolio = () => {
   const { username } = useParams();
@@ -16,6 +15,7 @@ const Portfolio = () => {
   const [error, setError] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
+  const [sections, setSections] = useState([{ id: 'profile', label: 'Profile' }]);
 
   // Initialize userData with default empty values
   const [userData, setUserData] = useState({
@@ -32,22 +32,10 @@ const Portfolio = () => {
     achievements: []
   });
 
-  // Destructure userData with default values
-  const {
-    profile,
-    experiences,
-    skills,
-    projects,
-    achievements
-  } = userData || {};
-
-  // Initialize sections state
-  const [sections, setSections] = useState([
-    { id: 'profile', label: 'Profile' }
-  ]);
-
   // Update sections based on available data
   useEffect(() => {
+    if (!userData) return;
+
     const availableSections = [
       { id: 'profile', label: 'Profile' }
     ];
@@ -71,8 +59,11 @@ const Portfolio = () => {
   // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!username) return;
+
       try {
         setLoading(true);
+        setError(null);
         
         // Get UID from username
         const usernameDoc = await getDoc(doc(db, 'usernames', username.toLowerCase()));
@@ -82,25 +73,34 @@ const Portfolio = () => {
         }
 
         // Get portfolio data using UID
-        const uid = usernameDoc.data().uid;
+        const uid = usernameDoc.data()?.uid;
+        if (!uid) {
+          throw new Error('Invalid user data');
+        }
+
         const portfolioDoc = await getDoc(doc(db, 'portfolios', uid));
         
-        if (portfolioDoc.exists()) {
-          const data = portfolioDoc.data();
-          setUserData({
-            profile: {
-              name: data.profile?.name || '',
-              title: data.profile?.title || '',
-              bio: data.profile?.bio || '',
-              avatar: data.profile?.avatar || '',
-              links: Array.isArray(data.profile?.links) ? data.profile.links : []
-            },
-            experiences: Array.isArray(data.experiences) ? data.experiences : [],
-            skills: Array.isArray(data.skills) ? data.skills : [],
-            projects: Array.isArray(data.projects) ? data.projects : [],
-            achievements: Array.isArray(data.achievements) ? data.achievements : []
-          });
+        if (!portfolioDoc.exists()) {
+          throw new Error('Portfolio data not found');
         }
+
+        const data = portfolioDoc.data();
+        
+        // Ensure all arrays exist with defaults
+        setUserData({
+          profile: {
+            name: data?.profile?.name || '',
+            title: data?.profile?.title || '',
+            bio: data?.profile?.bio || '',
+            avatar: data?.profile?.avatar || '',
+            links: Array.isArray(data?.profile?.links) ? data.profile.links : []
+          },
+          experiences: Array.isArray(data?.experiences) ? data.experiences : [],
+          skills: Array.isArray(data?.skills) ? data.skills : [],
+          projects: Array.isArray(data?.projects) ? data.projects : [],
+          achievements: Array.isArray(data?.achievements) ? data.achievements : []
+        });
+
       } catch (error) {
         console.error('Error fetching portfolio:', error);
         setError(error.message);
@@ -109,12 +109,13 @@ const Portfolio = () => {
       }
     };
 
-    if (username) {
-      fetchUserData();
-    }
+    fetchUserData();
   }, [username]);
 
   const renderNavLinks = () => {
+    // Safety check for sections
+    if (!Array.isArray(sections)) return null;
+
     return sections.map(section => (
       <a
         key={section.id}
@@ -163,9 +164,8 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Responsive Navigation */}
+      {/* Navigation */}
       <nav className="fixed top-[64px] left-0 right-0 z-40">
-        {/* Mobile Menu Button */}
         <div className="lg:hidden absolute right-4 top-3 z-50">
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -179,7 +179,6 @@ const Portfolio = () => {
           </button>
         </div>
 
-        {/* Navigation Content */}
         <div className={`
           backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 border-b border-white/20 dark:border-gray-700/20
           lg:block
@@ -205,33 +204,33 @@ const Portfolio = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-24">
             <section id="profile" className="scroll-mt-32">
-              <ProfileCard profile={profile || {}} />
+              <ProfileCard profile={userData?.profile || {}} />
             </section>
 
-            {experiences?.length > 0 && (
+            {userData?.experiences?.length > 0 && (
               <section id="experience" className="scroll-mt-32">
                 <div className="grid lg:grid-cols-2 gap-8">
                   <div className="transform hover:scale-[1.02] transition-all duration-300">
-                    <ExperienceCard experiences={experiences} />
+                    <ExperienceCard experiences={userData.experiences} />
                   </div>
-                  {skills?.length > 0 && (
+                  {userData?.skills?.length > 0 && (
                     <div id="skills" className="transform hover:scale-[1.02] transition-all duration-300">
-                      <SkillsCard skills={skills} />
+                      <SkillsCard skills={userData.skills} />
                     </div>
                   )}
                 </div>
               </section>
             )}
 
-            {projects?.length > 0 && (
+            {userData?.projects?.length > 0 && (
               <section id="projects" className="scroll-mt-32">
-                <ProjectCard projects={projects} />
+                <ProjectCard projects={userData.projects} />
               </section>
             )}
 
-            {achievements?.length > 0 && (
+            {userData?.achievements?.length > 0 && (
               <section id="achievements" className="scroll-mt-32 mb-24 min-h-[50vh]">
-                <AchievementCard achievements={achievements} />
+                <AchievementCard achievements={userData.achievements} />
               </section>
             )}
           </div>

@@ -20,11 +20,7 @@ const getSocialIcon = (name) => {
   }
 };
 
-const ProfileCard = ({ profile }) => {
-  if (!profile) {
-    return null;
-  }
-
+const ProfileCard = ({ profile = {} }) => {
   const {
     name = 'User',
     title = '',

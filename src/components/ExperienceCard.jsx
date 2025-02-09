@@ -1,7 +1,7 @@
 import React from 'react';
 import CardContainer from './CardContainer';
 
-const ExperienceCard = ({ experiences }) => {
+const ExperienceCard = ({ experiences = [] }) => {
   return (
     <CardContainer title="Experience">
       <div className="space-y-8">

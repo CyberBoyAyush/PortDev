@@ -19,8 +19,8 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
 
-  // Initialize form data with all required sections
-  const [formData, setFormData] = useState({
+  // Initialize default empty state
+  const defaultFormData = {
     profile: {
       name: '',
       title: '',
@@ -28,42 +28,13 @@ const EditProfile = () => {
       avatar: '',
       links: []
     },
-    skills: [
-      {
-        category: 'Frontend',
-        items: [{ name: '', level: 80 }]
-      }
-    ],
-    experiences: [
-      {
-        role: '',
-        company: '',
-        startDate: '',
-        endDate: '',
-        description: '',
-        skills: []
-      }
-    ],
-    projects: [
-      {
-        title: '',
-        description: '',
-        image: '',
-        technologies: [],
-        github: '',
-        demo: ''
-      }
-    ],
-    achievements: [
-      {
-        title: '',
-        issuer: '',
-        date: '',
-        description: '',
-        url: ''
-      }
-    ]
-  });
+    skills: [],
+    experiences: [],
+    projects: [],
+    achievements: []
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -91,12 +62,29 @@ const EditProfile = () => {
         const portfolioSnap = await getDoc(portfolioRef);
         
         if (portfolioSnap.exists()) {
-          setFormData(portfolioSnap.data());
+          const data = portfolioSnap.data();
+          // Ensure all arrays exist
+          setFormData({
+            profile: {
+              name: data.profile?.name || '',
+              title: data.profile?.title || '',
+              bio: data.profile?.bio || '',
+              avatar: data.profile?.avatar || '',
+              links: Array.isArray(data.profile?.links) ? data.profile.links : []
+            },
+            skills: Array.isArray(data.skills) ? data.skills : [],
+            experiences: Array.isArray(data.experiences) ? data.experiences : [],
+            projects: Array.isArray(data.projects) ? data.projects : [],
+            achievements: Array.isArray(data.achievements) ? data.achievements : []
+          });
+        } else {
+          // Set default empty state if no portfolio exists
+          setFormData(defaultFormData);
         }
-        
       } catch (error) {
         console.error('Fetch error:', error);
         toast.error('Failed to load profile data');
+        setFormData(defaultFormData);
       } finally {
         setLoading(false);
       }
@@ -141,32 +129,62 @@ const EditProfile = () => {
     }
   };
 
-  // Add new items to arrays
+  // Add new items to arrays with null checks
   const addItem = (section, item) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: [...prev[section], item]
-    }));
+    if (section.includes('.')) {
+      // Handle nested arrays like profile.links
+      const [parent, child] = section.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: [...(prev[parent]?.[child] || []), item]
+        }
+      }));
+    } else {
+      // Handle top-level arrays
+      setFormData(prev => ({
+        ...prev,
+        [section]: [...(prev[section] || []), item]
+      }));
+    }
   };
 
-  // Remove items from arrays
+  // Remove items from arrays with null checks
   const removeItem = (section, index) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: prev[section].filter((_, i) => i !== index)
-    }));
+    if (section.includes('.')) {
+      // Handle nested arrays
+      const [parent, child] = section.split('.');
+      if (!formData[parent]?.[child]) return;
+      
+      setFormData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: prev[parent][child].filter((_, i) => i !== index)
+        }
+      }));
+    } else {
+      // Handle top-level arrays
+      if (!formData[section]) return;
+      
+      setFormData(prev => ({
+        ...prev,
+        [section]: prev[section].filter((_, i) => i !== index)
+      }));
+    }
   };
 
   // Add technology to project
   const addTechnology = (projectIndex) => {
-    const newProjects = [...formData.projects];
+    const newProjects = [...(formData.projects || [])];
     newProjects[projectIndex].technologies.push('');
     setFormData({ ...formData, projects: newProjects });
   };
 
   // Add skill to experience
   const addSkill = (expIndex) => {
-    const newExperiences = [...formData.experiences];
+    const newExperiences = [...(formData.experiences || [])];
     newExperiences[expIndex].skills.push('');
     setFormData({ ...formData, experiences: newExperiences });
   };
@@ -268,7 +286,7 @@ const EditProfile = () => {
                   </button>
                 </div>
 
-                {formData.profile.links.map((link, index) => (
+                {Array.isArray(formData.profile?.links) && formData.profile.links.map((link, index) => (
                   <div key={index} className="flex gap-2">
                     <input
                       type="text"
@@ -332,7 +350,7 @@ const EditProfile = () => {
             </div>
             
             <div className="space-y-6">
-              {formData.experiences.map((exp, index) => (
+              {Array.isArray(formData.experiences) && formData.experiences.map((exp, index) => (
                 <div key={index} className="space-y-4 p-4 bg-gray-800/30 rounded-lg">
                   <input
                     type="text"
@@ -417,7 +435,7 @@ const EditProfile = () => {
               </button>
             </div>
 
-            {formData.skills.map((category, categoryIndex) => (
+            {Array.isArray(formData.skills) && formData.skills.map((category, categoryIndex) => (
               <div key={categoryIndex} className="mb-6 p-4 bg-gray-800/30 rounded-lg">
                 <input
                   type="text"
@@ -513,7 +531,7 @@ const EditProfile = () => {
               </button>
             </div>
 
-            {formData.projects.map((project, projectIndex) => (
+            {Array.isArray(formData.projects) && formData.projects.map((project, projectIndex) => (
               <div key={projectIndex} className="mb-6 p-4 bg-gray-800/30 rounded-lg">
                 <input
                   type="text"
@@ -633,7 +651,7 @@ const EditProfile = () => {
               </button>
             </div>
 
-            {formData.achievements.map((achievement, achievementIndex) => (
+            {Array.isArray(formData.achievements) && formData.achievements.map((achievement, achievementIndex) => (
               <div key={achievementIndex} className="mb-6 p-4 bg-gray-800/30 rounded-lg">
                 <input
                   type="text"
