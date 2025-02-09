@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
-import { FaGithub, FaGoogle } from 'react-icons/fa';
-import { HiSparkles } from 'react-icons/hi2';
+import { HiSparkles, HiUser, HiEnvelope, HiLockClosed } from 'react-icons/hi2';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase-config';
+import { db } from '../config/firebase';
+import toast from 'react-hot-toast';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -98,147 +98,187 @@ const SignUp = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-4">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 via-transparent to-blue-500/20" />
-        <div className="absolute inset-0 backdrop-blur-3xl" />
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
+      {/* Enhanced Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -left-1/4 w-[50rem] h-[50rem] bg-blue-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-blob"></div>
+        <div className="absolute -bottom-1/4 -right-1/4 w-[50rem] h-[50rem] bg-purple-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-blob animation-delay-2000"></div>
+        <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[1px]"></div>
       </div>
-      
-      {/* Sign Up Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        <div className="bg-white/10 p-8 rounded-2xl backdrop-blur-xl border border-white/10">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
-            <p className="text-gray-400 flex items-center justify-center gap-2">
-              Join the PortDev community <HiSparkles className="text-yellow-500" />
-            </p>
-          </div>
 
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+      {/* Sign Up Container */}
+      <div className="max-w-md w-full mx-auto space-y-8 relative z-10">
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 mb-2">
+            Create Account
+          </h2>
+          <p className="text-gray-400 text-sm flex items-center justify-center gap-2">
+            Join the PortDev community 
+            <HiSparkles className="text-yellow-500 animate-pulse" />
+          </p>
+        </div>
 
-          <div className="space-y-4">
-            <div className="space-y-4 mb-6">
-              <motion.button
-                whileHover={{ y: -2 }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 
-                         bg-white/5 hover:bg-white/10 text-white rounded-lg 
-                         border border-white/10 transition-all duration-200"
-              >
-                <FaGithub className="text-xl" />
-                Continue with GitHub
-              </motion.button>
-              
-              <motion.button
-                whileHover={{ y: -2 }}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 
-                         bg-white/5 hover:bg-white/10 text-white rounded-lg 
-                         border border-white/10 transition-all duration-200"
-              >
-                <FaGoogle className="text-xl" />
-                Continue with Google
-              </motion.button>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-[#0A0A0F] text-gray-400">Or continue with email</span>
-              </div>
-            </div>
-
-            <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+        {/* Sign Up Form Card */}
+        <div className="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/20 shadow-2xl shadow-black/40">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Name Fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-200 mb-1 block">First Name</label>
                 <input
                   type="text"
-                  placeholder="First Name"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
-                           text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                           transition-colors duration-200"
-                />
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
-                           text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                           transition-colors duration-200"
+                  placeholder="John"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl
+                           text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 
+                           focus:border-transparent transition-all duration-200"
                 />
               </div>
-              <input
-                type="text"
-                placeholder="Choose a username"
-                className={`w-full px-4 py-3 bg-white/5 border ${
-                  usernameError ? 'border-red-500' : 'border-white/10'
-                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                transition-colors duration-200`}
-                value={username}
-                onChange={handleUsernameChange}
-              />
+              <div>
+                <label className="text-sm font-medium text-gray-200 mb-1 block">Last Name</label>
+                <input
+                  type="text"
+                  placeholder="Doe"
+                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl
+                           text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 
+                           focus:border-transparent transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Username</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <HiUser className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Choose a username"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  className={`w-full pl-10 pr-3 py-3 bg-gray-800/50 border ${
+                    usernameError ? 'border-red-500' : 'border-gray-700'
+                  } rounded-xl text-white placeholder-gray-400 focus:ring-2 
+                  focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+                />
+              </div>
               {usernameError && (
-                <p className="text-sm text-red-500 mt-1">{usernameError}</p>
+                <p className="mt-1 text-sm text-red-400">{usernameError}</p>
               )}
               {checkingUsername && (
-                <p className="text-sm text-yellow-500 mt-1">Checking username availability...</p>
+                <p className="mt-1 text-sm text-yellow-400">Checking availability...</p>
               )}
-              <input
-                type="email"
-                placeholder="Email"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
-                         text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                         transition-colors duration-200"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
-                         text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                         transition-colors duration-200"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg 
-                         text-white placeholder-gray-500 focus:outline-none focus:border-purple-500
-                         transition-colors duration-200"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              
-              <motion.button
-                whileHover={{ y: -2 }}
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 
-                         text-white rounded-lg font-medium hover:opacity-90
-                         transition-opacity duration-200"
-              >
-                Create Account
-              </motion.button>
-            </form>
-          </div>
+            </div>
 
-          <p className="mt-6 text-center text-gray-400">
+            {/* Email Field */}
+            <div>
+              <label className="text-sm font-medium text-gray-200 mb-1 block">Email</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <HiEnvelope className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-gray-700 rounded-xl
+                           text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 
+                           focus:border-transparent transition-all duration-200"
+                />
+              </div>
+            </div>
+
+            {/* Password Fields */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-200 mb-1 block">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <HiLockClosed className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Create a strong password"
+                    className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-gray-700 rounded-xl
+                             text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 
+                             focus:border-transparent transition-all duration-200"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-gray-200 mb-1 block">Confirm Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <HiLockClosed className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your password"
+                    className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-gray-700 rounded-xl
+                             text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 
+                             focus:border-transparent transition-all duration-200"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-sm text-red-400">{error}</p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-xl text-white font-medium
+                       bg-gradient-to-r from-blue-600 to-purple-600
+                       hover:from-blue-500 hover:to-purple-500
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                       transform transition-all duration-200
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       shadow-lg shadow-blue-500/25"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Creating Account...
+                </div>
+              ) : (
+                'Create Account'
+              )}
+            </motion.button>
+          </form>
+
+          {/* Login Link */}
+          <p className="mt-8 text-center text-gray-400">
             Already have an account?{' '}
-            <Link to="/login" className="text-purple-500 hover:text-purple-400">
+            <Link to="/login" className="text-blue-400 hover:text-blue-300 transition-colors">
               Sign in
             </Link>
           </p>
         </div>
-      </motion.div>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-500">
+          Built with{' '}
+          <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+            ♥️
+          </span>
+          {' '}by PortDev
+        </p>
+      </div>
     </div>
   );
 };
