@@ -1,6 +1,8 @@
 import React from 'react';
-import { FaGithub, FaLinkedin, FaTwitter, FaGlobe } from 'react-icons/fa';
-import { HiMail } from 'react-icons/hi';
+import { motion } from 'framer-motion';
+import { FaGithub, FaLinkedin, FaTwitter, FaGlobe, FaCode, FaHackerrank } from 'react-icons/fa';
+import { SiLeetcode, SiGeeksforgeeks } from 'react-icons/si';
+import { HiMail, HiSparkles, HiLocationMarker, HiLink } from 'react-icons/hi';
 
 const getSocialIcon = (name) => {
   if (!name) return null;
@@ -15,6 +17,15 @@ const getSocialIcon = (name) => {
       return <FaGlobe className="w-5 h-5" />;
     case 'email':
       return <HiMail className="w-5 h-5" />;
+    case 'leetcode':
+      return <SiLeetcode className="w-5 h-5 text-[#FFA116]" />;
+    case 'geeksforgeeks':
+    case 'gfg':
+      return <SiGeeksforgeeks className="w-5 h-5 text-[#2F8D46]" />;
+    case 'hackerrank':
+      return <FaHackerrank className="w-5 h-5 text-[#00EA64]" />;
+    case 'coding':
+      return <FaCode className="w-5 h-5" />;
     default:
       return null;
   }
@@ -26,81 +37,149 @@ const ProfileCard = ({ profile = {} }) => {
     title = '',
     bio = '',
     avatar = '',
-    links = []
+    links = [],
+    location = ''
   } = profile;
 
   return (
-    <div className="relative overflow-hidden backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 rounded-2xl shadow-2xl border border-white/20 dark:border-gray-700/20">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 -translate-x-1/2 translate-y-1/2 rounded-full blur-3xl"></div>
+    <div className="relative z-10 overflow-hidden">
+      {/* Hero Banner Section */}
+      <div className="relative h-52 rounded-t-3xl overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20" />
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-30" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.8 }}
+          transition={{ duration: 1 }}
+          className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/80"
+        />
       </div>
 
-      {/* Content Container */}
-      <div className="relative p-8">
-        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8">
-          {/* Avatar Container */}
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-75 group-hover:opacity-100 blur transition duration-300"></div>
-            <div className="relative">
-              <img 
-                src={avatar || `https://ui-avatars.com/api/?name=${name}`} 
-                alt={name}
-                className="w-40 h-40 rounded-full object-cover border-4 border-white dark:border-gray-800 transform group-hover:scale-105 transition duration-300" 
-              />
-            </div>
-          </div>
+      {/* Profile Content Card */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative -mt-28 mx-4 rounded-3xl backdrop-blur-xl 
+                 bg-white/60 dark:bg-gray-800/60 
+                 border border-white/20 dark:border-gray-700/20 
+                 shadow-2xl"
+      >
+        <div className="p-8">
+          {/* Avatar & Basic Info */}
+          <div className="flex flex-col items-center text-center space-y-4">
+            {/* Avatar Container */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 100 }}
+              className="relative"
+            >
+              {/* Avatar Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 
+                           rounded-full blur-xl opacity-75 animate-pulse" />
+              {/* Avatar Image */}
+              <div className="relative w-32 h-32">
+                <img 
+                  src={avatar || `https://ui-avatars.com/api/?name=${name}`}
+                  alt={name}
+                  className="w-full h-full rounded-full object-cover border-4 border-white 
+                           dark:border-gray-800 shadow-xl"
+                />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  className="absolute -right-2 -top-2 w-8 h-8 bg-gradient-to-r 
+                           from-yellow-400 to-orange-500 rounded-full 
+                           flex items-center justify-center shadow-lg"
+                >
+                  <HiSparkles className="w-5 h-5 text-white" />
+                </motion.div>
+              </div>
+            </motion.div>
 
-          {/* Info Container */}
-          <div className="flex-1 text-center lg:text-left space-y-6">
-            {/* Name and Title */}
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-                {name || 'Anonymous User'}
-              </h1>
-              {title && <p className="text-2xl bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-semibold">
-                {title}
-              </p>}
+            {/* Name & Title */}
+            <div className="space-y-2">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-3xl font-bold text-gray-900 dark:text-white"
+              >
+                {name}
+              </motion.h1>
+              {title && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-xl bg-gradient-to-r from-blue-500 to-purple-500 
+                           bg-clip-text text-transparent font-semibold"
+                >
+                  {title}
+                </motion.p>
+              )}
+              {location && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-center justify-center gap-1 text-gray-500"
+                >
+                  <HiLocationMarker className="w-4 h-4" />
+                  <span>{location}</span>
+                </motion.div>
+              )}
             </div>
 
             {/* Bio */}
-            {bio && <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed max-w-2xl">
-              {bio}
-            </p>}
+            {bio && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="max-w-2xl text-gray-600 dark:text-gray-300 leading-relaxed"
+              >
+                {bio}
+              </motion.p>
+            )}
 
             {/* Social Links */}
-            {Array.isArray(links) && links.length > 0 && (
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            {links.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-wrap justify-center gap-3 pt-4"
+              >
                 {links.map((link, index) => (
-                  link && link.url && link.name && (
-                    <a
+                  link?.url && link?.name && (
+                    <motion.a
                       key={index}
+                      whileHover={{ y: -2, scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex items-center gap-2 px-4 py-2 rounded-xl
-                               bg-gradient-to-r from-gray-50 to-gray-100 
-                               dark:from-gray-700 dark:to-gray-800
-                               hover:from-blue-500 hover:to-purple-500
-                               border border-gray-200 dark:border-gray-600
-                               text-gray-700 dark:text-gray-300 hover:text-white
-                               transform hover:scale-105 hover:shadow-lg
-                               transition-all duration-300"
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl
+                               bg-white/10 backdrop-blur-sm border border-white/20
+                               hover:bg-white/20 hover:border-white/30
+                               dark:hover:bg-gray-800/50
+                               text-gray-700 dark:text-gray-300
+                               transform transition-all duration-200"
                     >
                       {getSocialIcon(link.name)}
-                      <span className="font-medium">{link.name}</span>
-                    </a>
+                      <span className="text-sm font-medium">{link.name}</span>
+                    </motion.a>
                   )
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
-      </div>
 
-      {/* Bottom Decoration */}
-      <div className="h-2 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+        {/* Bottom Gradient Line */}
+        <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-b-3xl" />
+      </motion.div>
     </div>
   );
 };
