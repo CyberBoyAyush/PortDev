@@ -31,6 +31,15 @@ const getSocialIcon = (name) => {
   }
 };
 
+const getFormattedUrl = (link) => {
+  if (!link?.url) return '';
+  if (link.name.toLowerCase() === 'mail') {
+    // Check if the URL already has mailto: prefix
+    return link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`;
+  }
+  return link.url;
+};
+
 const ProfileCard = ({ profile = {} }) => {
   const {
     name = 'User',
@@ -157,8 +166,8 @@ const ProfileCard = ({ profile = {} }) => {
                       key={index}
                       whileHover={{ y: -2, scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      href={link.url}
-                      target="_blank"
+                      href={getFormattedUrl(link)}
+                      target={link.name.toLowerCase() === 'mail' ? '_self' : '_blank'}
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-xl
                                bg-white/10 backdrop-blur-sm border border-white/20
