@@ -7,23 +7,38 @@ import toast from 'react-hot-toast';
 import { HiPlus, HiTrash, HiChevronDown, HiUser, HiChip, HiBriefcase, HiCode, HiAcademicCap } from 'react-icons/hi';
 import { SiGithub, SiLeetcode } from 'react-icons/si';
 
-// Add new MobileSection component
-const MobileSection = ({ title, children, isOpen, onToggle, icon: Icon }) => (
+// Update MobileSection to include Add button
+const MobileSection = ({ title, children, isOpen, onToggle, icon: Icon, onAdd }) => (
   <div className="mb-4">
-    <button
-      onClick={onToggle}
-      className="w-full flex items-center justify-between p-4 bg-white/5 
-                 rounded-lg text-white font-medium"
-    >
-      <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+      <button
+        onClick={onToggle}
+        className="flex-1 flex items-center gap-2 text-white font-medium"
+      >
         {Icon && <Icon className="w-5 h-5 text-gray-400" />}
         <span>{title}</span>
+      </button>
+      
+      <div className="flex items-center gap-2">
+        {onAdd && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAdd();
+            }}
+            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <HiPlus className="w-5 h-5 text-blue-400" />
+          </button>
+        )}
+        <button onClick={onToggle}>
+          <HiChevronDown 
+            className={`w-5 h-5 text-gray-400 transition-transform duration-200 
+                     ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
       </div>
-      <HiChevronDown 
-        className={`w-5 h-5 text-gray-400 transition-transform duration-200 
-                   ${isOpen ? 'rotate-180' : ''}`}
-      />
-    </button>
+    </div>
     {isOpen && (
       <div className="mt-2 p-4 bg-white/5 rounded-lg">
         {children}
@@ -317,7 +332,7 @@ const EditProfile = () => {
           Edit Portfolio
         </h1>
 
-        {/* Mobile View */}
+        {/* Mobile View with Add buttons */}
         <div className="block lg:hidden space-y-4">
           <MobileSection
             title="Basic Profile"
@@ -465,6 +480,10 @@ const EditProfile = () => {
             isOpen={openSections.skills}
             onToggle={() => toggleSection('skills')}
             icon={HiChip}
+            onAdd={() => addItem('skills', {
+              category: '',
+              items: [{ name: '', level: 80 }]
+            })}
           >
             {/* ... existing skills form fields ... */}
             <div className="space-y-6">
@@ -551,6 +570,14 @@ const EditProfile = () => {
             isOpen={openSections.experiences}
             onToggle={() => toggleSection('experiences')}
             icon={HiBriefcase}
+            onAdd={() => addItem('experiences', {
+              role: '',
+              company: '',
+              startDate: '',
+              endDate: '',
+              description: '',
+              skills: []
+            })}
           >
             {/* ... existing experience form fields ... */}
             <div className="space-y-6">
@@ -629,6 +656,14 @@ const EditProfile = () => {
             isOpen={openSections.projects}
             onToggle={() => toggleSection('projects')}
             icon={HiCode}
+            onAdd={() => addItem('projects', {
+              title: '',
+              description: '',
+              image: '',
+              technologies: [],
+              github: '',
+              demo: ''
+            })}
           >
             {/* ... existing projects form fields ... */}
             <div className="space-y-6">
@@ -740,6 +775,13 @@ const EditProfile = () => {
             isOpen={openSections.achievements}
             onToggle={() => toggleSection('achievements')}
             icon={HiAcademicCap}
+            onAdd={() => addItem('achievements', {
+              title: '',
+              issuer: '',
+              date: '',
+              description: '',
+              url: ''
+            })}
           >
             {/* ... existing achievements form fields ... */}
             <div className="space-y-6">
