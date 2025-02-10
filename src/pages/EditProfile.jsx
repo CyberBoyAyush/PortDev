@@ -5,6 +5,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import toast from 'react-hot-toast';
 import { HiPlus, HiTrash, HiChevronDown, HiUser, HiChip, HiBriefcase, HiCode, HiAcademicCap } from 'react-icons/hi';
+import { SiGithub, SiLeetcode } from 'react-icons/si';
 
 // Add new MobileSection component
 const MobileSection = ({ title, children, isOpen, onToggle, icon: Icon }) => (
@@ -51,7 +52,9 @@ const EditProfile = () => {
       title: '',
       bio: '',
       avatar: '',
-      links: []
+      links: [],
+      githubUsername: '', // Add GitHub username
+      leetcodeUsername: '' // Add LeetCode username
     },
     skills: [],
     experiences: [],
@@ -111,7 +114,9 @@ const EditProfile = () => {
               title: data.profile?.title || '',
               bio: data.profile?.bio || '',
               avatar: data.profile?.avatar || '',
-              links: Array.isArray(data.profile?.links) ? data.profile.links : []
+              links: Array.isArray(data.profile?.links) ? data.profile.links : [],
+              githubUsername: data.profile?.githubUsername || '', // Add this
+              leetcodeUsername: data.profile?.leetcodeUsername || '' // Add this
             },
             skills: Array.isArray(data.skills) ? data.skills : [],
             experiences: Array.isArray(data.experiences) ? data.experiences : [],
@@ -230,6 +235,66 @@ const EditProfile = () => {
     setFormData({ ...formData, experiences: newExperiences });
   };
 
+  const renderCodingPlatforms = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-300">GitHub Username</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={formData.profile.githubUsername || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              profile: { ...formData.profile, githubUsername: e.target.value }
+            })}
+            className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
+                     text-white placeholder-gray-500 focus:border-blue-500 transition-colors"
+            placeholder="Your GitHub username"
+          />
+          {formData.profile.githubUsername && (
+            <a
+              href={`https://github.com/${formData.profile.githubUsername}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 rounded-lg bg-gray-800/50 text-gray-400 hover:text-white 
+                       transition-colors"
+            >
+              <SiGithub className="w-5 h-5" />
+            </a>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-gray-300">LeetCode Username</label>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={formData.profile.leetcodeUsername || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              profile: { ...formData.profile, leetcodeUsername: e.target.value }
+            })}
+            className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
+                     text-white placeholder-gray-500 focus:border-blue-500 transition-colors"
+            placeholder="Your LeetCode username"
+          />
+          {formData.profile.leetcodeUsername && (
+            <a
+              href={`https://leetcode.com/${formData.profile.leetcodeUsername}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-3 rounded-lg bg-gray-800/50 text-gray-400 hover:text-white 
+                       transition-colors"
+            >
+              <SiLeetcode className="w-5 h-5" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -322,6 +387,8 @@ const EditProfile = () => {
                   placeholder="https://example.com/your-image.jpg"
                 />
               </div>
+
+              {renderCodingPlatforms()}
 
               {/* Social Links */}
               <div className="space-y-3">
@@ -811,6 +878,8 @@ const EditProfile = () => {
                   placeholder="https://example.com/your-image.jpg"
                 />
               </div>
+
+              {renderCodingPlatforms()}
 
               {/* Social Links */}
               <div className="space-y-3">
