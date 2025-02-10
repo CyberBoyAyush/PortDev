@@ -419,16 +419,16 @@ const EditProfile = () => {
                            rounded-lg text-white text-sm sm:text-base"
                     >
                       <option value="">Select Platform</option>
-                      <option value="github">GitHub</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="leetcode">LeetCode</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="website">Website</option>
-                      <option value="mail">Mail</option>
-                      <option value="hackerrank">Hackerrank</option>
-                      <option value="coding">Coding</option>
-                      <option value="geeksforgeeks">GeeksForGeeks</option>
-                      <option value="others">Other</option>
+                      <option value="Github">GitHub</option>
+                      <option value="Linkedin">LinkedIn</option>
+                      <option value="Leetcode">LeetCode</option>
+                      <option value="Twitter">Twitter</option>
+                      <option value="Website">Website</option>
+                      <option value="Mail">Mail</option>
+                      <option value="Hackerrank">Hackerrank</option>
+                      <option value="Coding">Coding</option>
+                      <option value="Geeksforgeeks">GeeksForGeeks</option>
+                      <option value="Others">Other</option>
                     </select>
                     <div className="flex gap-2">
                       <input
@@ -910,16 +910,16 @@ const EditProfile = () => {
                            rounded-lg text-white text-sm sm:text-base"
                     >
                       <option value="">Select Platform</option>
-                      <option value="github">GitHub</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="leetcode">LeetCode</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="website">Website</option>
-                      <option value="mail">Mail</option>
-                      <option value="hackerrank">Hackerrank</option>
-                      <option value="coding">Coding</option>
-                      <option value="geeksforgeeks">GeeksForGeeks</option>
-                      <option value="others">Other</option>
+                      <option value="Github">GitHub</option>
+                      <option value="Linkedin">LinkedIn</option>
+                      <option value="Leetcode">LeetCode</option>
+                      <option value="Twitter">Twitter</option>
+                      <option value="Website">Website</option>
+                      <option value="Mail">Mail</option>
+                      <option value="Hackerrank">Hackerrank</option>
+                      <option value="Coding">Coding</option>
+                      <option value="Geeksforgeeks">GeeksForGeeks</option>
+                      <option value="Others">Other</option>
                     </select>
                     <div className="flex gap-2">
                       <input

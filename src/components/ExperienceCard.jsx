@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { HiBriefcase, HiCalendar, HiOfficeBuilding, HiChip } from 'react-icons/hi';
+import { HiCalendar, HiOfficeBuilding, HiChip } from 'react-icons/hi';
+import { FaBriefcase } from 'react-icons/fa'; // Changed to FaBriefcase for better visibility
 import CardContainer from './CardContainer';
 
 const ExperienceCard = ({ experiences = [] }) => {
@@ -18,16 +19,16 @@ const ExperienceCard = ({ experiences = [] }) => {
             viewport={{ once: true }}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Timeline Node */}
+            {/* Timeline Node with Briefcase Icon */}
             <div className="absolute -left-6">
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 p-0.5"
               >
-                <div className="w-full h-full rounded-xl bg-white dark:bg-gray-900 
-                             flex items-center justify-center">
-                  <HiBriefcase className="w-6 h-6 text-transparent bg-clip-text 
-                                      bg-gradient-to-br from-blue-500 to-purple-500" />
+                <div className="w-full h-full rounded-xl bg-gray-900 
+                             flex items-center justify-center relative overflow-hidden 
+                             hover:bg-gray-800 transition-colors duration-300">
+                  <FaBriefcase className="w-5 h-5 text-blue-400" /> {/* Changed styling here */}
                 </div>
               </motion.div>
             </div>
