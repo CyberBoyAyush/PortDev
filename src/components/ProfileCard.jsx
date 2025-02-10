@@ -15,7 +15,7 @@ const getSocialIcon = (name) => {
       return <FaTwitter className="w-5 h-5" />;
     case 'website':
       return <FaGlobe className="w-5 h-5" />;
-    case 'email':
+    case 'mail':
       return <HiMail className="w-5 h-5" />;
     case 'leetcode':
       return <SiLeetcode className="w-5 h-5 text-[#FFA116]" />;
