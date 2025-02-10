@@ -79,16 +79,32 @@ const SkillsCard = ({ skills = [] }) => {
                 transition={{ delay: idx * 0.1 }}
                 className="space-y-4"
               >
-                {/* Category Header with Icon */}
+                {/* Category Header with Enhanced Icon */}
                 <div className="flex items-center gap-3 pb-2 border-b border-gray-200 dark:border-gray-700">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 
-                               p-0.5 transform transition-transform duration-300">
-                    <div className="w-full h-full rounded-xl bg-white dark:bg-gray-900 
-                                 flex items-center justify-center">
-                      <CategoryIcon className="w-5 h-5 text-transparent bg-clip-text 
-                                          bg-gradient-to-br from-blue-500 to-purple-500" />
+                  <motion.div
+                    whileHover={{ scale: 1.05, rotate: 5 }}
+                    className="relative w-12 h-12"
+                  >
+                    {/* Animated Background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl 
+                                  animate-pulse opacity-50" />
+                    
+                    {/* Icon Container */}
+                    <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 p-0.5">
+                      <div className="w-full h-full rounded-xl bg-white dark:bg-gray-900 
+                                   flex items-center justify-center overflow-hidden">
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 
+                                      opacity-0 group-hover:opacity-100 transition-opacity" />
+                        
+                        {/* Icon - Updated styling */}
+                        <CategoryIcon className="w-6 h-6 text-blue-500 dark:text-blue-400
+                                              transform transition-transform duration-300
+                                              hover:scale-110" />
+                      </div>
                     </div>
-                  </div>
+                  </motion.div>
+                  
                   <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
                     {category.category}
                   </h3>

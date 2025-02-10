@@ -8,6 +8,7 @@ import SkillsCard from '../components/SkillsCard';
 import ExperienceCard from '../components/ExperienceCard';
 import AchievementCard from '../components/AchievementCard';
 import ProjectCard from '../components/ProjectCard';
+import ActivityCard from '../components/ActivityCard';
 
 const Portfolio = () => {
   const { username } = useParams();
@@ -24,7 +25,9 @@ const Portfolio = () => {
       title: '',
       bio: '',
       avatar: '',
-      links: []
+      links: [],
+      githubUsername: '', // Add this
+      leetcodeUsername: '' // Add this
     },
     experiences: [],
     skills: [],
@@ -38,7 +41,12 @@ const Portfolio = () => {
 
     const availableSections = [{ id: 'profile', label: 'Profile' }];
 
-    // Separate skills and experience sections
+    // Add coding stats section if either username exists
+    if (userData.profile?.githubUsername || userData.profile?.leetcodeUsername) {
+      availableSections.push({ id: 'coding', label: 'Coding Stats' });
+    }
+
+    // Add other sections
     if (userData.experiences?.length > 0) {
       availableSections.push({ id: 'experience', label: 'Experience' });
     }
@@ -92,7 +100,9 @@ const Portfolio = () => {
             title: data?.profile?.title || '',
             bio: data?.profile?.bio || '',
             avatar: data?.profile?.avatar || '',
-            links: Array.isArray(data?.profile?.links) ? data.profile.links : []
+            links: Array.isArray(data?.profile?.links) ? data.profile.links : [],
+            githubUsername: data?.profile?.githubUsername || '', // Add this
+            leetcodeUsername: data?.profile?.leetcodeUsername || '' // Add this
           },
           experiences: Array.isArray(data?.experiences) ? data.experiences : [],
           skills: Array.isArray(data?.skills) ? data.skills : [],
@@ -287,6 +297,16 @@ const Portfolio = () => {
             <section id="profile" className="scroll-mt-32">
               <ProfileCard profile={userData?.profile || {}} />
             </section>
+
+            {/* Coding Stats Section - Only show if usernames are provided */}
+            {(userData?.profile?.githubUsername || userData?.profile?.leetcodeUsername) && (
+              <section id="coding" className="scroll-mt-32">
+                <ActivityCard 
+                  githubUsername={userData?.profile?.githubUsername}
+                  leetcodeUsername={userData?.profile?.leetcodeUsername}
+                />
+              </section>
+            )}
 
             {/* Experience Section */}
             {userData?.experiences?.length > 0 && (
