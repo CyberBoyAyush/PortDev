@@ -15,7 +15,7 @@ const getSocialIcon = (name) => {
       return <FaTwitter className="w-5 h-5" />;
     case 'website':
       return <FaGlobe className="w-5 h-5" />;
-    case 'email':
+    case 'mail':
       return <HiMail className="w-5 h-5" />;
     case 'leetcode':
       return <SiLeetcode className="w-5 h-5 text-[#FFA116]" />;
@@ -29,6 +29,15 @@ const getSocialIcon = (name) => {
     default:
       return null;
   }
+};
+
+const getFormattedUrl = (link) => {
+  if (!link?.url) return '';
+  if (link.name.toLowerCase() === 'mail') {
+    // Check if the URL already has mailto: prefix
+    return link.url.startsWith('mailto:') ? link.url : `mailto:${link.url}`;
+  }
+  return link.url;
 };
 
 const ProfileCard = ({ profile = {} }) => {
@@ -157,8 +166,8 @@ const ProfileCard = ({ profile = {} }) => {
                       key={index}
                       whileHover={{ y: -2, scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      href={link.url}
-                      target="_blank"
+                      href={getFormattedUrl(link)}
+                      target={link.name.toLowerCase() === 'mail' ? '_self' : '_blank'}
                       rel="noopener noreferrer"
                       className="flex items-center gap-2 px-4 py-2 rounded-xl
                                bg-white/10 backdrop-blur-sm border border-white/20
