@@ -246,25 +246,25 @@ const Portfolio = () => {
                   ))}
                 </div>
 
-                {/* Mobile Menu Button - Centered */}
-                <div className="lg:hidden flex justify-center w-full">
-                  <button
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10
-                             hover:bg-white/10 transition-colors"
-                  >
-                    {isMenuOpen ? (
-                      <HiX className="w-5 h-5 text-white" />
-                    ) : (
-                      <HiMenu className="w-5 h-5 text-white" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+                {/* Mobile Menu Button */}
+                        <div className="lg:hidden absolute right-4">
+                          <button
+                          onClick={() => setIsMenuOpen(!isMenuOpen)}
+                          className="p-2 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10
+                               hover:bg-white/10 transition-colors"
+                          >
+                          {isMenuOpen ? (
+                            <HiX className="w-5 h-5 text-white" />
+                          ) : (
+                            <HiMenu className="w-5 h-5 text-white" />
+                          )}
+                          </button>
+                        </div>
+                        </div>
+                      </div>
+                      </div>
 
-          {/* Mobile Menu - Centered Content */}
+                      {/* Mobile Menu - Centered Content */}
           {isMenuOpen && (
             <div className="lg:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1 bg-gray-900/80 backdrop-blur-xl">

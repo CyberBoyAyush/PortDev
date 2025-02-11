@@ -7,8 +7,9 @@ import toast from 'react-hot-toast';
 import { HiUser, HiLockClosed, HiArrowLeft } from 'react-icons/hi';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState(''); // Combined state for email/username
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(''); // Add email state for reset
   const [loading, setLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
@@ -20,60 +21,51 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // First, get the email associated with the username
-      const usernameDoc = await getDoc(doc(db, 'usernames', username.toLowerCase()));
-      
-      if (!usernameDoc.exists()) {
-        throw new Error('Username not found');
-      }
+      // Check if input is an email
+      const isEmail = identifier.includes('@');
+      let loginEmail = '';
 
-      // Get the user document to find the email
-      const userDoc = await getDoc(doc(db, 'users', usernameDoc.data().uid));
-      
-      if (!userDoc.exists()) {
-        throw new Error('User not found');
-      }
+      if (isEmail) {
+        // If it's an email, use it directly
+        loginEmail = identifier;
+      } else {
+        // If it's a username, get the associated email
+        const usernameDoc = await getDoc(doc(db, 'usernames', identifier.toLowerCase()));
+        
+        if (!usernameDoc.exists()) {
+          throw new Error('Username not found');
+        }
 
-      const email = userDoc.data().email;
+        const userDoc = await getDoc(doc(db, 'users', usernameDoc.data().uid));
+        
+        if (!userDoc.exists()) {
+          throw new Error('User not found');
+        }
+
+        loginEmail = userDoc.data().email;
+      }
       
       // Login with email and password
-      await login(email, password);
+      await login(loginEmail, password);
       toast.success('Welcome back!');
       navigate('/');
     } catch (error) {
       console.error('Login error:', error);
-      toast.error(error.message || 'Failed to sign in');
+      toast.error('Invalid username/email or password');
     } finally {
       setLoading(false);
     }
   }
 
   const handleResetPassword = async () => {
-    if (!username) {
-      toast.error('Please enter your username first');
+    if (!email) {
+      toast.error('Please enter your email address');
       return;
     }
 
     try {
       setResetLoading(true);
-      
-      // Get email from username
-      const usernameDoc = await getDoc(doc(db, 'usernames', username.toLowerCase()));
-      
-      if (!usernameDoc.exists()) {
-        throw new Error('Username not found');
-      }
-
-      // Get user's email
-      const userDoc = await getDoc(doc(db, 'users', usernameDoc.data().uid));
-      
-      if (!userDoc.exists()) {
-        throw new Error('User not found');
-      }
-
-      const email = userDoc.data().email;
       await resetPassword(email);
-      
       toast.success('Password reset email sent! Check your inbox.');
       setIsResetting(false);
     } catch (error) {
@@ -102,7 +94,7 @@ const Login = () => {
           </h2>
           <p className="text-gray-400 text-sm">
             {isResetting 
-              ? 'Enter your username and we\'ll send you instructions' 
+              ? 'Enter your email address and we\'ll send you instructions' 
               : 'Enter your credentials to access your portfolio'}
           </p>
         </div>
@@ -112,10 +104,10 @@ const Login = () => {
           {!isResetting ? (
             // Login Form
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {/* Username Input */}
+              {/* Identifier Input */}
               <div>
                 <label className="text-sm font-medium text-gray-200 mb-1 block">
-                  Username
+                  Email or Username
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -124,13 +116,13 @@ const Login = () => {
                   <input
                     type="text"
                     required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
                              bg-gray-800/50 text-white placeholder-gray-400
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent
                              transition-all duration-200"
-                    placeholder="Your username"
+                    placeholder="Enter email or username"
                   />
                 </div>
               </div>
@@ -195,24 +187,23 @@ const Login = () => {
           ) : (
             // Reset Password Form
             <div className="space-y-6">
-              {/* Username Input for Reset */}
               <div>
                 <label className="text-sm font-medium text-gray-200 mb-1 block">
-                  Username
+                  Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <HiUser className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
                              bg-gray-800/50 text-white placeholder-gray-400
                              focus:ring-2 focus:ring-blue-500 focus:border-transparent
                              transition-all duration-200"
-                    placeholder="Your username"
+                    placeholder="Your email address"
                   />
                 </div>
               </div>
@@ -243,7 +234,7 @@ const Login = () => {
                       Sending...
                     </div>
                   ) : (
-                    'Send Instructions'
+                    'Send Reset Link'
                   )}
                 </button>
               </div>

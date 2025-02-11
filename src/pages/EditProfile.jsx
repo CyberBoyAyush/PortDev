@@ -264,7 +264,7 @@ const EditProfile = () => {
             })}
             className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
                      text-white placeholder-gray-500 focus:border-blue-500 transition-colors"
-            placeholder="Your GitHub username"
+            placeholder="Your GitHub Username"
           />
           {formData.profile.githubUsername && (
             <a
@@ -292,7 +292,7 @@ const EditProfile = () => {
             })}
             className="flex-1 px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-lg 
                      text-white placeholder-gray-500 focus:border-blue-500 transition-colors"
-            placeholder="Your LeetCode username"
+            placeholder="Your LeetCode Username"
           />
           {formData.profile.leetcodeUsername && (
             <a
@@ -739,7 +739,7 @@ const EditProfile = () => {
                   </div>
                   <input
                     type="url"
-                    placeholder="GitHub URL"
+                    placeholder="Project GitHub URL"
                     value={project.github}
                     onChange={(e) => {
                       const newProjects = [...formData.projects];
@@ -750,7 +750,7 @@ const EditProfile = () => {
                   />
                   <input
                     type="url"
-                    placeholder="Demo URL"
+                    placeholder="Site Live URL"
                     value={project.demo}
                     onChange={(e) => {
                       const newProjects = [...formData.projects];
@@ -1266,7 +1266,7 @@ const EditProfile = () => {
                 </div>
                 <input
                   type="url"
-                  placeholder="GitHub URL"
+                  placeholder="Project Github URL"
                   value={project.github}
                   onChange={(e) => {
                     const newProjects = [...formData.projects];

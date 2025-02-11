@@ -146,9 +146,15 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Username Field */}
+            {/* Username Field with Warning */}
             <div>
-              <label className="text-sm font-medium text-gray-200 mb-1 block">Username</label>
+              <div className="flex justify-between items-center mb-1">
+                <label className="text-sm font-medium text-gray-200">Username</label>
+                <span className="text-xs text-amber-400 flex items-center gap-1">
+                  <HiSparkles className="w-3 h-3" />
+                  Cannot be changed later
+                </span>
+              </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <HiUser className="h-5 w-5 text-gray-400" />
@@ -170,6 +176,9 @@ const SignUp = () => {
               {checkingUsername && (
                 <p className="mt-1 text-sm text-yellow-400">Checking availability...</p>
               )}
+              <p className="mt-1.5 text-xs text-gray-400">
+                This will be your unique identifier: portdev.com/{username || 'username'}
+              </p>
             </div>
 
             {/* Email Field */}
