@@ -1,34 +1,106 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { HiArrowRight, HiSparkles, HiCube, HiCog, HiLightningBolt, HiTemplate } from 'react-icons/hi';
+import { Link, useNavigate } from 'react-router-dom';
+import { HiArrowRight, HiSparkles, HiCube, HiCog, HiLightningBolt, HiTemplate, HiPencil } from 'react-icons/hi';
+import { useAuth } from '../contexts/AuthContext';
 
 const Home = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  
+  // Enhanced features with more details
   const features = [
     { 
       icon: HiTemplate,
       title: "Modern Design",
       description: "Beautiful, responsive portfolios that stand out",
-      gradient: "from-blue-500 to-purple-500"
+      gradient: "from-blue-500 to-purple-500",
+      highlights: ["Responsive Layout", "Dark Mode", "Animated UI"]
     },
     {
       icon: HiLightningBolt,
       title: "Easy to Use",
       description: "Set up your portfolio in minutes, no coding required",
-      gradient: "from-orange-500 to-pink-500"
+      gradient: "from-orange-500 to-pink-500",
+      highlights: ["Quick Setup", "Simple Interface", "Live Preview"]
     },
     {
       icon: HiCube,
       title: "Customizable",
       description: "Personalize every aspect to match your style",
-      gradient: "from-green-500 to-teal-500"
+      gradient: "from-green-500 to-teal-500",
+      highlights: ["Custom Themes", "Layout Options", "Font Choices"]
     },
     {
       icon: HiCog,
       title: "SEO Optimized",
       description: "Get discovered by recruiters and clients",
-      gradient: "from-purple-500 to-indigo-500"
+      gradient: "from-purple-500 to-indigo-500",
+      highlights: ["Meta Tags", "Fast Loading", "Best Practices"]
     }
   ];
+
+  const renderCTAButtons = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, duration: 0.6 }}
+      className="flex flex-wrap justify-center gap-4 pt-4"
+    >
+      {currentUser ? (
+        <Link
+          to="/edit-profile"
+          className="group relative inline-flex items-center px-8 py-4 rounded-xl 
+                   overflow-hidden backdrop-blur-sm transition-all duration-300"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-70
+                        group-hover:opacity-100 transition-opacity" />
+          <span className="relative z-10 flex items-center text-white font-medium">
+            Edit Portfolio
+            <HiPencil className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </span>
+        </Link>
+      ) : (
+        <Link
+          to="/signup"
+          className="group relative inline-flex items-center px-8 py-4 rounded-xl 
+                   overflow-hidden backdrop-blur-sm transition-all duration-300"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-70
+                        group-hover:opacity-100 transition-opacity" />
+          <span className="relative z-10 flex items-center text-white font-medium">
+            Get Started Free
+            <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </span>
+        </Link>
+      )}
+      
+      <Link
+        to="/examples"
+        className="group relative inline-flex items-center px-8 py-4 rounded-xl 
+                 overflow-hidden transition-all duration-300"
+      >
+        {/* Gradient border effect */}
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+        
+        {/* Inner background */}
+        <div className="absolute inset-[1px] rounded-[10px] bg-gray-900" />
+        
+        {/* Animated gradient overlay */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300
+                     bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+        
+        {/* Button content */}
+        <span className="relative z-10 flex items-center text-white font-medium">
+          <span className="relative">
+            View Examples
+            <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500
+                         group-hover:w-full transition-all duration-300" />
+          </span>
+          <HiArrowRight className="ml-2 w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+        </span>
+      </Link>
+    </motion.div>
+  );
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gray-900">
@@ -81,37 +153,8 @@ const Home = () => {
               Showcase your skills and projects with a beautiful portfolio website in minutes.
             </p>
 
-            {/* Enhanced CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="flex flex-wrap justify-center gap-4 pt-4"
-            >
-              <Link
-                to="/signup"
-                className="group relative inline-flex items-center px-8 py-4 rounded-xl 
-                         overflow-hidden backdrop-blur-sm transition-all duration-300"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-70
-                              group-hover:opacity-100 transition-opacity" />
-                <span className="relative z-10 flex items-center text-white font-medium">
-                  Get Started Free
-                  <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Link>
-              
-              <Link
-                to="/examples"
-                className="group inline-flex items-center px-8 py-4 rounded-xl text-white 
-                         font-medium border border-white/10 hover:bg-white/5 backdrop-blur-sm 
-                         transition-all duration-300"
-              >
-                View Examples
-                <HiArrowRight className="ml-2 w-5 h-5 opacity-0 group-hover:opacity-100 
-                                     group-hover:translate-x-1 transition-all" />
-              </Link>
-            </motion.div>
+            {/* Updated CTA Buttons */}
+            {renderCTAButtons()}
           </motion.div>
 
           {/* Enhanced Features Grid */}
@@ -119,7 +162,7 @@ const Home = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="mt-32 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
+            className="mt-32 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto px-4"
           >
             {features.map((feature, index) => (
               <motion.div
@@ -127,25 +170,51 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
-                className="group relative p-6 backdrop-blur-xl bg-white/5 rounded-2xl border border-white/10
-                         hover:bg-white/10 transition-all duration-300"
+                className="group relative p-1 rounded-2xl transition-all duration-300"
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 
-                              group-hover:opacity-5 transition-opacity rounded-2xl`} />
-                <div className="relative">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-white/5 to-white/10 
-                               flex items-center justify-center mb-4">
-                    <feature.icon className={`w-6 h-6 bg-gradient-to-r ${feature.gradient} 
-                                         bg-clip-text text-transparent`} />
+                {/* Gradient Border Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent 
+                              rounded-2xl transition-opacity group-hover:via-white/10" />
+                
+                {/* Card Content */}
+                <div className="relative p-6 rounded-xl backdrop-blur-xl bg-white/5 border border-white/10
+                              hover:bg-white/[0.07] transition-all duration-300">
+                  {/* Icon Container */}
+                  <div className="relative flex items-center gap-4 mb-6">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.gradient} p-0.5`}>
+                      <div className="w-full h-full rounded-xl bg-gray-900 flex items-center justify-center">
+                        <feature.icon className="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white group-hover:text-transparent 
+                                   group-hover:bg-clip-text group-hover:bg-gradient-to-r 
+                                   group-hover:from-white via-blue-500 to-purple-500 transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-transparent 
-                             group-hover:bg-clip-text group-hover:bg-gradient-to-r 
-                             group-hover:from-purple-400 group-hover:to-pink-400 transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-400">
-                    {feature.description}
-                  </p>
+
+                  {/* Feature Highlights */}
+                  <div className="space-y-3">
+                    {feature.highlights.map((highlight, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${feature.gradient}`} />
+                        <span className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                          {highlight}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hover Effect Overlay */}
+                  <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-10 
+                                transition-opacity duration-300 pointer-events-none">
+                    <div className={`h-full w-full bg-gradient-to-br ${feature.gradient}`} />
+                  </div>
                 </div>
               </motion.div>
             ))}
