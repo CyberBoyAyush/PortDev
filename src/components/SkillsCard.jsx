@@ -248,6 +248,21 @@ const SkillsCard = ({ skills = [] }) => {
     </motion.div>
   );
 
+  // Helper function to determine grid columns based on number of categories
+  const getGridColumns = (categoryCount) => {
+    if (categoryCount === 1) return 'md:grid-cols-1';
+    if (categoryCount === 2) return 'md:grid-cols-2';
+    if (categoryCount === 4) return 'md:grid-cols-2 lg:grid-cols-4';
+    return 'md:grid-cols-2 lg:grid-cols-3'; // Default for 3 or more (except 4)
+  };
+
+  // Helper function to determine card width based on number of categories
+  const getCardWidth = (categoryCount) => {
+    if (categoryCount === 1) return 'md:max-w-2xl md:mx-auto';
+    if (categoryCount === 2) return 'md:max-w-4xl md:mx-auto';
+    return 'w-full'; // Full width for 3 or more
+  };
+
   return (
     <div className="relative backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 
                     rounded-2xl shadow-2xl p-4 sm:p-8 border border-white/20">
@@ -263,7 +278,7 @@ const SkillsCard = ({ skills = [] }) => {
           Skills
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className={`grid grid-cols-1 gap-4 sm:gap-6 ${getGridColumns(skills.length)} ${getCardWidth(skills.length)}`}>
           {skills.map((category, idx) => (
             <>
               {/* Show compact version on mobile, full version on desktop */}
