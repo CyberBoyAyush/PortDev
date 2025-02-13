@@ -12,6 +12,8 @@ const Examples = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const PINNED_USERNAMES = ['ayush', 'vrandagarg']; // Usernames to pin
+
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
@@ -34,6 +36,7 @@ const Examples = () => {
             if (portfolio) {
               return {
                 username,
+                isPinned: PINNED_USERNAMES.includes(username.toLowerCase()),
                 ...portfolio.data()
               };
             }
@@ -41,10 +44,16 @@ const Examples = () => {
           })
         );
 
-        // Filter out null values and sort by recent updates
+        // Sort portfolios: pinned first, then by update date
         const validPortfolios = portfolioData
           .filter(portfolio => portfolio !== null)
-          .sort((a, b) => b.updatedAt?.localeCompare(a.updatedAt));
+          .sort((a, b) => {
+            // First sort by pinned status
+            if (a.isPinned && !b.isPinned) return -1;
+            if (!a.isPinned && b.isPinned) return 1;
+            // Then sort by update date
+            return b.updatedAt?.localeCompare(a.updatedAt);
+          });
 
         setPortfolios(validPortfolios);
       } catch (err) {
@@ -115,6 +124,79 @@ const Examples = () => {
     </Link>
   );
 
+  const PortfolioCard = ({ portfolio }) => (
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="group"
+    >
+      <Link to={`/${portfolio.username}`}>
+        <div className={`relative overflow-hidden rounded-2xl backdrop-blur-xl 
+                      bg-white/5 border border-white/10 p-6 
+                      hover:bg-white/10 transition-all duration-300
+                      hover:shadow-xl hover:shadow-blue-500/5
+                      ${portfolio.isPinned ? 'ring-2 ring-purple-500/50' : ''}`}
+        >
+          {/* Pinned Badge */}
+          {portfolio.isPinned && (
+            <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-purple-500/20 border border-purple-500/30">
+              <span className="text-xs font-medium text-purple-300">Featured</span>
+            </div>
+          )}
+
+          {/* Profile Header */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative">
+              <img
+                src={portfolio.profile?.avatar || '/default-avatar.png'}
+                alt={portfolio.profile?.name}
+                className="w-16 h-16 rounded-full object-cover border-2 border-white/10"
+              />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900"></div>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-white group-hover:text-transparent 
+                         group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 
+                         group-hover:bg-clip-text transition-all duration-300">
+                {portfolio.profile?.name || 'Anonymous'}
+              </h3>
+              <p className="text-blue-400">
+                {portfolio.profile?.title || 'Developer'}
+              </p>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { icon: HiCodeBracket, label: 'Projects', value: portfolio.projects?.length || 0 },
+              { icon: HiBriefcase, label: 'Experience', value: portfolio.experiences?.length || 0 },
+              { icon: HiWrenchScrewdriver, label: 'Skills', value: portfolio.skills?.reduce((acc, curr) => acc + curr.items.length, 0) || 0 }
+            ].map((stat, index) => (
+              <div key={index} className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                <stat.icon className="w-5 h-5 text-gray-400 mb-2" />
+                <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                  {stat.value}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* View Button */}
+          <div className="mt-6 flex justify-end">
+            <span className="inline-flex items-center gap-2 text-blue-400 font-medium 
+                         group-hover:translate-x-1 transition-transform">
+              View Portfolio
+              <HiArrowRight className="w-4 h-4" />
+            </span>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
+  );
+
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-900">
       {/* Background Effects */}
@@ -173,68 +255,7 @@ const Examples = () => {
             className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {portfolios.map((portfolio) => (
-              <motion.div
-                key={portfolio.username}
-                whileHover={{ y: -5 }}
-                className="group"
-              >
-                <Link to={`/${portfolio.username}`}>
-                  <div className="relative overflow-hidden rounded-2xl backdrop-blur-xl 
-                               bg-white/5 border border-white/10 p-6 
-                               hover:bg-white/10 transition-all duration-300
-                               hover:shadow-xl hover:shadow-blue-500/5">
-                    {/* Profile Header */}
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="relative">
-                        <img
-                          src={portfolio.profile?.avatar || '/default-avatar.png'}
-                          alt={portfolio.profile?.name}
-                          className="w-16 h-16 rounded-full object-cover border-2 border-white/10"
-                        />
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-gray-900"></div>
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-white group-hover:text-transparent 
-                                   group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400 
-                                   group-hover:bg-clip-text transition-all duration-300">
-                          {portfolio.profile?.name || 'Anonymous'}
-                        </h3>
-                        <p className="text-blue-400">
-                          {portfolio.profile?.title || 'Developer'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-3">
-                      {[
-                        { icon: HiCodeBracket, label: 'Projects', value: portfolio.projects?.length || 0 },
-                        { icon: HiBriefcase, label: 'Experience', value: portfolio.experiences?.length || 0 },
-                        { icon: HiWrenchScrewdriver, label: 'Skills', value: portfolio.skills?.reduce((acc, curr) => acc + curr.items.length, 0) || 0 }
-                      ].map((stat, index) => (
-                        <div key={index} className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                          <stat.icon className="w-5 h-5 text-gray-400 mb-2" />
-                          <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                            {stat.value}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {stat.label}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* View Button */}
-                    <div className="mt-6 flex justify-end">
-                      <span className="inline-flex items-center gap-2 text-blue-400 font-medium 
-                                   group-hover:translate-x-1 transition-transform">
-                        View Portfolio
-                        <HiArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
+              <PortfolioCard key={portfolio.username} portfolio={portfolio} />
             ))}
           </motion.div>
         )}
