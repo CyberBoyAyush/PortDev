@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { motion } from 'framer-motion';
-import { HiArrowRight, HiSparkles, HiCodeBracket, HiBriefcase, HiWrenchScrewdriver } from 'react-icons/hi2';
+import { HiArrowRight, HiSparkles, HiCodeBracket, HiBriefcase, HiWrenchScrewdriver, HiPencil } from 'react-icons/hi2';
+import { useAuth } from '../contexts/AuthContext';
 
 const Examples = () => {
+  const { currentUser } = useAuth();
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -90,6 +92,29 @@ const Examples = () => {
     }
   };
 
+  const renderCTAButton = () => (
+    <Link
+      to={currentUser ? "/edit-profile" : "/signup"}
+      className="inline-flex items-center px-8 py-4 rounded-xl
+                bg-gradient-to-r from-blue-600 to-purple-600 
+                text-white font-medium group
+                hover:shadow-lg hover:shadow-blue-500/25 
+                transition-all duration-300"
+    >
+      {currentUser ? (
+        <>
+          Create Your's From Here
+          <HiPencil className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </>
+      ) : (
+        <>
+          Create Your Portfolio
+          <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        </>
+      )}
+    </Link>
+  );
+
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-900">
       {/* Background Effects */}
@@ -137,14 +162,7 @@ const Examples = () => {
             <div className="text-gray-400 space-y-4">
               <HiSparkles className="w-8 h-8 mx-auto text-yellow-500" />
               <p>No portfolios available yet. Be the first to create one!</p>
-              <Link
-                to="/signup"
-                className="inline-flex items-center px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 
-                         text-white font-medium hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
-              >
-                Create Your Portfolio
-                <HiArrowRight className="ml-2 w-5 h-5" />
-              </Link>
+              {renderCTAButton()}
             </div>
           </motion.div>
         ) : (
@@ -221,24 +239,14 @@ const Examples = () => {
           </motion.div>
         )}
 
-        {/* CTA Section */}
+        {/* Updated CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           className="text-center mt-16"
         >
-          <Link
-            to="/signup"
-            className="inline-flex items-center px-8 py-4 rounded-xl
-                     bg-gradient-to-r from-blue-600 to-purple-600 
-                     text-white font-medium group
-                     hover:shadow-lg hover:shadow-blue-500/25 
-                     transition-all duration-300"
-          >
-            Create Your Portfolio
-            <HiArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
+          {renderCTAButton()}
         </motion.div>
       </div>
     </div>
