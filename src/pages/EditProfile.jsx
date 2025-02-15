@@ -74,7 +74,8 @@ const EditProfile = () => {
     skills: [],
     experiences: [],
     projects: [],
-    achievements: []
+    achievements: [],
+    education: []  // Add this line
   };
 
   const [formData, setFormData] = useState(defaultFormData);
@@ -85,7 +86,8 @@ const EditProfile = () => {
     skills: false,
     experiences: false,
     projects: false,
-    achievements: false
+    achievements: false,
+    education: false
   });
 
   const toggleSection = (section) => {
@@ -136,7 +138,8 @@ const EditProfile = () => {
             skills: Array.isArray(data.skills) ? data.skills : [],
             experiences: Array.isArray(data.experiences) ? data.experiences : [],
             projects: Array.isArray(data.projects) ? data.projects : [],
-            achievements: Array.isArray(data.achievements) ? data.achievements : []
+            achievements: Array.isArray(data.achievements) ? data.achievements : [],
+            education: Array.isArray(data.education) ? data.education : []  // Add this
           });
         } else {
           // Set default empty state if no portfolio exists
@@ -308,6 +311,117 @@ const EditProfile = () => {
         </div>
       </div>
     </div>
+  );
+
+  // Add education section to mobile view
+  const renderEducationMobile = () => (
+    <MobileSection
+      title="Education"
+      isOpen={openSections.education}
+      onToggle={() => toggleSection('education')}
+      icon={HiAcademicCap}
+      onAdd={() => addItem('education', {
+        degree: '',
+        school: '',
+        startYear: '',
+        endYear: '',
+        location: '',
+        description: '',
+        grade: ''
+      })}
+    >
+      <div className="space-y-6">
+        {formData.education?.map((edu, index) => (
+          <div key={index} className="space-y-4 p-4 bg-gray-800/30 rounded-lg">
+            <input
+              type="text"
+              placeholder="Degree/Course"
+              value={edu.degree}
+              onChange={(e) => {
+                const newEducation = [...formData.education];
+                newEducation[index] = { ...edu, degree: e.target.value };
+                setFormData({ ...formData, education: newEducation });
+              }}
+              className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+            />
+            <input
+              type="text"
+              placeholder="School/Institution"
+              value={edu.school}
+              onChange={(e) => {
+                const newEducation = [...formData.education];
+                newEducation[index] = { ...edu, school: e.target.value };
+                setFormData({ ...formData, education: newEducation });
+              }}
+              className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                placeholder="Start Year"
+                value={edu.startYear}
+                onChange={(e) => {
+                  const newEducation = [...formData.education];
+                  newEducation[index] = { ...edu, startYear: e.target.value };
+                  setFormData({ ...formData, education: newEducation });
+                }}
+                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+              />
+              <input
+                type="text"
+                placeholder="End Year"
+                value={edu.endYear}
+                onChange={(e) => {
+                  const newEducation = [...formData.education];
+                  newEducation[index] = { ...edu, endYear: e.target.value };
+                  setFormData({ ...formData, education: newEducation });
+                }}
+                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="Location"
+              value={edu.location}
+              onChange={(e) => {
+                const newEducation = [...formData.education];
+                newEducation[index] = { ...edu, location: e.target.value };
+                setFormData({ ...formData, education: newEducation });
+              }}
+              className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+            />
+            <input
+              type="text"
+              placeholder="Grade/Score"
+              value={edu.grade}
+              onChange={(e) => {
+                const newEducation = [...formData.education];
+                newEducation[index] = { ...edu, grade: e.target.value };
+                setFormData({ ...formData, education: newEducation });
+              }}
+              className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+            />
+            <textarea
+              placeholder="Description"
+              value={edu.description}
+              onChange={(e) => {
+                const newEducation = [...formData.education];
+                newEducation[index] = { ...edu, description: e.target.value };
+                setFormData({ ...formData, education: newEducation });
+              }}
+              rows={3}
+              className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+            />
+            <button
+              onClick={() => removeItem('education', index)}
+              className="text-red-400 hover:text-red-300"
+            >
+              Remove Education
+            </button>
+          </div>
+        ))}
+      </div>
+    </MobileSection>
   );
 
   if (loading) {
@@ -852,6 +966,8 @@ const EditProfile = () => {
               ))}
             </div>
           </MobileSection>
+
+          {renderEducationMobile()}
         </div>
 
         {/* Desktop View */}
@@ -1379,6 +1495,32 @@ const EditProfile = () => {
                 </button>
               </div>
             ))}
+          </section>
+
+          {/* Education Section */}
+          <section className="backdrop-blur-xl bg-white/10 rounded-xl border border-white/20 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <HiAcademicCap className="w-5 h-5" />
+                Education
+              </h2>
+              <button
+                onClick={() => addItem('education', {
+                  degree: '',
+                  school: '',
+                  startYear: '',
+                  endYear: '',
+                  location: '',
+                  description: '',
+                  grade: ''
+                })}
+                className="text-blue-400 hover:text-blue-300"
+              >
+                <HiPlus className="w-5 h-5" />
+              </button>
+            </div>
+            
+            {renderEducationMobile()}
           </section>
         </div>
 
