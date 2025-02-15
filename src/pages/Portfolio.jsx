@@ -9,6 +9,7 @@ import ExperienceCard from '../components/ExperienceCard';
 import AchievementCard from '../components/AchievementCard';
 import ProjectCard from '../components/ProjectCard';
 import ActivityCard from '../components/ActivityCard';
+import EducationCard from '../components/EducationCard';
 
 const Portfolio = () => {
   const { username } = useParams();
@@ -32,7 +33,8 @@ const Portfolio = () => {
     experiences: [],
     skills: [],
     projects: [],
-    achievements: []
+    achievements: [],
+    education: [] // Add education to initial state
   });
 
   // Update sections based on available data
@@ -44,6 +46,10 @@ const Portfolio = () => {
     // Add coding stats section if either username exists
     if (userData.profile?.githubUsername || userData.profile?.leetcodeUsername) {
       availableSections.push({ id: 'coding', label: 'Coding Stats' });
+    }
+
+    if (userData.education?.length > 0) {
+      availableSections.push({ id: 'education', label: 'Education' });
     }
 
     // Add other sections
@@ -59,6 +65,7 @@ const Portfolio = () => {
     if (userData.achievements?.length > 0) {
       availableSections.push({ id: 'achievements', label: 'Achievements' });
     }
+    
 
     setSections(availableSections);
   }, [userData]);
@@ -107,7 +114,8 @@ const Portfolio = () => {
           experiences: Array.isArray(data?.experiences) ? data.experiences : [],
           skills: Array.isArray(data?.skills) ? data.skills : [],
           projects: Array.isArray(data?.projects) ? data.projects : [],
-          achievements: Array.isArray(data?.achievements) ? data.achievements : []
+          achievements: Array.isArray(data?.achievements) ? data.achievements : [],
+          education: Array.isArray(data?.education) ? data.education : [] // Add this
         });
 
       } catch (error) {
@@ -315,6 +323,13 @@ const Portfolio = () => {
               </section>
             )}
 
+            {/* Education Section */}
+            {userData?.education?.length > 0 && (
+              <section id="education" className="scroll-mt-32">
+                <EducationCard education={userData.education} />
+              </section>
+            )}
+
             {/* Skills Section */}
             {userData?.skills?.length > 0 && (
               <section id="skills" className="scroll-mt-32">
@@ -335,6 +350,7 @@ const Portfolio = () => {
                 <AchievementCard achievements={userData.achievements} />
               </section>
             )}
+
           </div>
         </div>
       </main>
