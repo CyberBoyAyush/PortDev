@@ -5,16 +5,20 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import toast from 'react-hot-toast';
 import { HiUser, HiLockClosed, HiArrowLeft } from 'react-icons/hi';
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 
 const Login = () => {
-  const [identifier, setIdentifier] = useState(''); // Combined state for email/username
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [email, setEmail] = useState(''); // Add email state for reset
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, resetPassword } = useAuth();
+  const { login, resetPassword, signInWithGoogle, signInWithGithub } = useAuth();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -76,9 +80,47 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result && result.isNewUser) {
+        navigate('/username-setup');
+      } else {
+        toast.success('Login successful!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast.error('Failed to sign in with Google');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGithubSignIn = async () => {
+    setGithubLoading(true);
+    try {
+      const result = await signInWithGithub();
+      
+      if (result && result.isNewUser) {
+        navigate('/username-setup');
+      } else {
+        toast.success('Login successful!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('GitHub login error:', error);
+      toast.error('Failed to sign in with GitHub');
+    } finally {
+      setGithubLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
-      {/* Enhanced Background Effects */}
+      {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/4 -left-1/4 w-[50rem] h-[50rem] bg-blue-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-blob"></div>
         <div className="absolute -bottom-1/4 -right-1/4 w-[50rem] h-[50rem] bg-purple-500/10 rounded-full mix-blend-normal filter blur-[128px] animate-blob animation-delay-2000"></div>
@@ -87,7 +129,7 @@ const Login = () => {
 
       {/* Login Container */}
       <div className="max-w-md w-full mx-auto space-y-8 relative z-10">
-        {/* Logo and Header */}
+        {/* Header */}
         <div className="text-center">
           <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 mb-2">
             {isResetting ? 'Reset Password' : 'Welcome back'}
@@ -103,87 +145,140 @@ const Login = () => {
         <div className="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/20 shadow-2xl shadow-black/40">
           {!isResetting ? (
             // Login Form
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              {/* Identifier Input */}
-              <div>
-                <label className="text-sm font-medium text-gray-200 mb-1 block">
-                  Email or Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <HiUser className="h-5 w-5 text-gray-400" />
+            <>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                {/* Identifier Input */}
+                <div>
+                  <label className="text-sm font-medium text-gray-200 mb-1 block">
+                    Email or Username
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <HiUser className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="text"
+                      required
+                      value={identifier}
+                      onChange={(e) => setIdentifier(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
+                               bg-gray-800/50 text-white placeholder-gray-400
+                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                               transition-all duration-200"
+                      placeholder="Enter email or username"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    required
-                    value={identifier}
-                    onChange={(e) => setIdentifier(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
-                             bg-gray-800/50 text-white placeholder-gray-400
-                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             transition-all duration-200"
-                    placeholder="Enter email or username"
-                  />
+                </div>
+
+                {/* Password Input */}
+                <div>
+                  <label className="text-sm font-medium text-gray-200 mb-1 block">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <HiLockClosed className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
+                               bg-gray-800/50 text-white placeholder-gray-400
+                               focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                               transition-all duration-200"
+                      placeholder="Your password"
+                    />
+                  </div>
+                </div>
+
+                {/* Forgot Password Link */}
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsResetting(true)}
+                    className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 px-4 rounded-xl text-white font-medium
+                         bg-gradient-to-r from-blue-600 to-purple-600
+                         hover:from-blue-500 hover:to-purple-500
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                         transform transition-all duration-200
+                         hover:scale-[1.02] active:scale-[0.98]
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         shadow-lg shadow-blue-500/25"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                      Signing in...
+                    </div>
+                  ) : (
+                    'Sign in'
+                  )}
+                </button>
+              </form>
+
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-700"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-gray-900/30 backdrop-blur-xl text-gray-400">or continue with</span>
                 </div>
               </div>
 
-              {/* Password Input */}
-              <div>
-                <label className="text-sm font-medium text-gray-200 mb-1 block">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <HiLockClosed className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-700 rounded-xl
-                             bg-gray-800/50 text-white placeholder-gray-400
-                             focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                             transition-all duration-200"
-                    placeholder="Your password"
-                  />
-                </div>
-              </div>
-
-              {/* Forgot Password Link */}
-              <div className="flex justify-end">
+              {/* Social Auth Buttons */}
+              <div className="grid grid-cols-2 gap-4">
                 <button
                   type="button"
-                  onClick={() => setIsResetting(true)}
-                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                  onClick={handleGoogleSignIn}
+                  disabled={googleLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-4 
+                         border border-gray-700 rounded-xl bg-white/5 text-white font-medium
+                         hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500
+                         transition-all duration-200 disabled:opacity-50"
                 >
-                  Forgot password?
+                  {googleLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <FcGoogle size={20} />
+                      Google
+                    </>
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={handleGithubSignIn}
+                  disabled={githubLoading}
+                  className="flex items-center justify-center gap-2 py-3 px-4 
+                         border border-gray-700 rounded-xl bg-white/5 text-white font-medium
+                         hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500
+                         transition-all duration-200 disabled:opacity-50"
+                >
+                  {githubLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <FaGithub size={20} className="text-white" />
+                      GitHub
+                    </>
+                  )}
                 </button>
               </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 rounded-xl text-white font-medium
-                       bg-gradient-to-r from-blue-600 to-purple-600
-                       hover:from-blue-500 hover:to-purple-500
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                       transform transition-all duration-200
-                       hover:scale-[1.02] active:scale-[0.98]
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       shadow-lg shadow-blue-500/25"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Signing in...
-                  </div>
-                ) : (
-                  'Sign in'
-                )}
-              </button>
-            </form>
+            </>
           ) : (
             // Reset Password Form
             <div className="space-y-6">
