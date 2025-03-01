@@ -22,13 +22,16 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Setup providers
+// Setup Google provider
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
+// Setup GitHub provider with additional scopes for better compatibility
 export const githubProvider = new GithubAuthProvider();
+// Request additional scopes if needed
+githubProvider.addScope('user:email'); // Request user email access
 githubProvider.setCustomParameters({
   allow_signup: 'true'
 });
