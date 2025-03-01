@@ -5,10 +5,12 @@ import {
   signOut, 
   sendPasswordResetEmail, 
   onAuthStateChanged,
-  signInWithPopup 
+  signInWithPopup,
+  GithubAuthProvider  // Add this import
 } from 'firebase/auth';
 import { auth, googleProvider, githubProvider, db } from '../config/firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import toast from 'react-hot-toast'; // Import toast for error handling
 
 const AuthContext = createContext();
 
@@ -45,7 +47,53 @@ export function AuthProvider({ children }) {
   }
 
   async function signInWithGithub() {
-    return handleSocialSignIn(githubProvider);
+    try {
+      // GitHub specific implementation for better error handling
+      const result = await signInWithPopup(auth, githubProvider);
+      
+      // This gives you a GitHub Access Token
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      const token = credential?.accessToken;
+      const user = result.user;
+      
+      // Check if user exists in firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      // If new user, we need to collect a username
+      if (!userDoc.exists()) {
+        setNeedsUsername(true);
+        setTempUserData({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || '',
+          provider: 'github'  // Add provider info
+        });
+        return { isNewUser: true, user: result.user };
+      }
+      
+      return { isNewUser: false, user: result.user };
+    } catch (error) {
+      console.error("GitHub auth error:", error);
+      
+      // Handle specific GitHub errors
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        const email = error.customData?.email;
+        toast.error(`An account already exists with the email ${email}. Try another sign-in method.`);
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        toast.error('Sign-in was cancelled by closing the popup.');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        // This is often a benign error that doesn't need user notification
+        console.log('Popup request was cancelled.');
+      } else if (error.code === 'auth/popup-blocked') {
+        toast.error('Sign-in popup was blocked by your browser. Please allow popups for this site.');
+      } else {
+        toast.error('Failed to sign in with GitHub. Please try again later.');
+      }
+      
+      throw error;
+    }
   }
 
   // Generic social sign-in handler
@@ -65,7 +113,8 @@ export function AuthProvider({ children }) {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName || '',
-          photoURL: user.photoURL || ''
+          photoURL: user.photoURL || '',
+          provider: 'google'  // Add provider info
         });
         return { isNewUser: true, user: result.user };
       }
@@ -74,8 +123,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       // Handle specific errors like account exists with different credential
       if (error.code === 'auth/account-exists-with-different-credential') {
-        // You could notify the user that they already have an account with a different provider
-        console.error("Account exists with different credentials", error);
+        toast.error('An account with this email already exists using a different sign-in method.');
       }
       throw error;
     }

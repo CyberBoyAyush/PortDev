@@ -112,7 +112,8 @@ const Login = () => {
       }
     } catch (error) {
       console.error('GitHub login error:', error);
-      toast.error('Failed to sign in with GitHub');
+      // Error is already handled by the auth context
+      // We don't need to show a duplicate toast here
     } finally {
       setGithubLoading(false);
     }
