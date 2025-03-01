@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { HiSparkles, HiUser, HiEnvelope, HiLockClosed } from 'react-icons/hi2';
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import toast from 'react-hot-toast';
@@ -13,11 +15,13 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [githubLoading, setGithubLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [checkingUsername, setCheckingUsername] = useState(false);
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signup, signInWithGoogle, signInWithGithub } = useAuth();
 
   const validateUsername = (username) => {
     const regex = /^[a-zA-Z0-9_]{3,20}$/;
@@ -89,13 +93,57 @@ const SignUp = () => {
         createdAt: new Date().toISOString()
       });
 
+      toast.success('Account created successfully!');
       navigate('/');
     } catch (error) {
       setError('Failed to create an account. ' + error.message);
       console.error('Signup error:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
+
+  const handleGoogleSignUp = async () => {
+    setGoogleLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      
+      if (result && result.isNewUser) {
+        // If it's a new user, they need to set username
+        navigate('/username-setup');
+      } else {
+        // If it's an existing user, take them to the dashboard
+        toast.success('Welcome back!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Google signup error:', error);
+      toast.error('Failed to sign up with Google');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGithubSignUp = async () => {
+    setGithubLoading(true);
+    try {
+      const result = await signInWithGithub();
+      
+      if (result && result.isNewUser) {
+        // If it's a new user, they need to set username
+        navigate('/username-setup');
+      } else {
+        // If it's an existing user, take them to the dashboard
+        toast.success('Welcome back!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('GitHub signup error:', error);
+      toast.error('Failed to sign up with GitHub');
+    } finally {
+      setGithubLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8 relative">
@@ -121,6 +169,57 @@ const SignUp = () => {
 
         {/* Sign Up Form Card */}
         <div className="backdrop-blur-xl bg-white/10 p-8 rounded-2xl border border-white/20 shadow-2xl shadow-black/40">
+          {/* Social Sign Up Buttons */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <button
+              type="button"
+              onClick={handleGoogleSignUp}
+              disabled={googleLoading}
+              className="flex items-center justify-center gap-2 py-3 px-4
+                       border border-gray-700 rounded-xl bg-white/5 text-white font-medium
+                       hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500
+                       transition-all duration-200 disabled:opacity-50"
+            >
+              {googleLoading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <FcGoogle size={20} />
+                  Google
+                </>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGithubSignUp}
+              disabled={githubLoading}
+              className="flex items-center justify-center gap-2 py-3 px-4
+                       border border-gray-700 rounded-xl bg-white/5 text-white font-medium
+                       hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500
+                       transition-all duration-200 disabled:opacity-50"
+            >
+              {githubLoading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <FaGithub size={20} className="text-white" />
+                  GitHub
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-900/30 backdrop-blur-xl text-gray-400">or continue with email</span>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
