@@ -139,7 +139,8 @@ const SignUp = () => {
       }
     } catch (error) {
       console.error('GitHub signup error:', error);
-      toast.error('Failed to sign up with GitHub');
+      // Error is already handled by the auth context
+      // We don't need to show a duplicate toast here
     } finally {
       setGithubLoading(false);
     }
