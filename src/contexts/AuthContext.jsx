@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../config/firebase';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  sendPasswordResetEmail, 
   onAuthStateChanged,
-  sendPasswordResetEmail // Add this import
+  signInWithPopup 
 } from 'firebase/auth';
+import { auth, googleProvider, githubProvider, db } from '../config/firebase';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -17,7 +19,9 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [needsUsername, setNeedsUsername] = useState(false);
+  const [tempUserData, setTempUserData] = useState(null);
+  
   function signup(email, password) {
     return createUserWithEmailAndPassword(auth, email, password);
   }
@@ -27,19 +31,116 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
+    setNeedsUsername(false);
+    setTempUserData(null);
     return signOut(auth);
   }
 
-  // Add reset password function
   function resetPassword(email) {
-    return sendPasswordResetEmail(auth, email, {
-      url: `${window.location.origin}/login`, // Redirect URL after password reset
-    });
+    return sendPasswordResetEmail(auth, email);
+  }
+
+  async function signInWithGoogle() {
+    return handleSocialSignIn(googleProvider);
+  }
+
+  async function signInWithGithub() {
+    return handleSocialSignIn(githubProvider);
+  }
+
+  // Generic social sign-in handler
+  async function handleSocialSignIn(provider) {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      // Check if user exists in firestore
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+      
+      // If new user, we need to collect a username
+      if (!userDoc.exists()) {
+        setNeedsUsername(true);
+        setTempUserData({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || '',
+          photoURL: user.photoURL || ''
+        });
+        return { isNewUser: true, user: result.user };
+      }
+      
+      return { isNewUser: false, user: result.user };
+    } catch (error) {
+      // Handle specific errors like account exists with different credential
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        // You could notify the user that they already have an account with a different provider
+        console.error("Account exists with different credentials", error);
+      }
+      throw error;
+    }
+  }
+
+  async function completeGoogleSignUp(username) {
+    return completeSocialSignUp(username);
+  }
+
+  async function completeGithubSignUp(username) {
+    return completeSocialSignUp(username);
+  }
+
+  // Generic function to complete social sign-up
+  async function completeSocialSignUp(username) {
+    if (!tempUserData) return;
+    
+    try {
+      // Store user data in Firestore
+      await setDoc(doc(db, 'users', tempUserData.uid), {
+        email: tempUserData.email,
+        username: username,
+        displayName: tempUserData.displayName || '',
+        photoURL: tempUserData.photoURL || '',
+        createdAt: serverTimestamp(),
+        bio: ''
+      });
+      
+      // Reserve username
+      await setDoc(doc(db, 'usernames', username), {
+        uid: tempUserData.uid,
+        createdAt: serverTimestamp()
+      });
+      
+      // Reset states
+      setNeedsUsername(false);
+      setTempUserData(null);
+      
+      return true;
+    } catch (error) {
+      throw error;
+    }
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+      
+      // If user is logged in, check if they need username setup
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) {
+          setNeedsUsername(true);
+          setTempUserData({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || '',
+            photoURL: user.photoURL || ''
+          });
+        } else {
+          setNeedsUsername(false);
+          setTempUserData(null);
+        }
+      }
+      
       setLoading(false);
     });
 
@@ -48,10 +149,18 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    needsUsername,
+    setNeedsUsername,
+    tempUserData,
     signup,
     login,
     logout,
-    resetPassword // Add this to the context value
+    resetPassword,
+    signInWithGoogle,
+    signInWithGithub,
+    completeGoogleSignUp,
+    completeGithubSignUp,
+    completeSocialSignUp
   };
 
   return (
